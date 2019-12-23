@@ -1,19 +1,20 @@
 \section{Background: Black-box performance models} \label{sec:background}
 
 
-%\subsection{Performance model}
-Performance models are built to model a system operations in terms of resources consumed. Performance models can be used to predict the performance of systems in the purpose of workload design~\citep{DBLP:journals/tse/KrishnamurthyRM06,DBLP:conf/fast/YadwadkarBGNS10,DBLP:journals/ase/SyerSJH17}, resources control~\citep{DBLP:conf/cnsm/GongGW10,DBLP:conf/sosp/CortezBMRFB17}, configuration selection~\citep{DBLP:conf/kbse/GuoCASW13,DBLP:conf/wosp/ValovPGFC17,DBLP:journals/ese/GuoYSASVCWY18}, and anomaly detection~\citep{DBLP:journals/csur/IbidunmoyeHE15,DBLP:conf/issre/FarshchiSWG15,DBLP:journals/stvr/GhaithWPJOM16}. Performance models can be divided into two categories~\citep{DBLP:conf/wosp/DidonaQRT15}. One is white box performance models, which is also called analytical models. White box performance models predict performance based on the assumption of system contexts, i.e., workload intensity and service demand.
+Performance models are built to model
+% a system operates
+system operations
+in terms of resources consumed. Performance models can be used to predict the performance of systems in the purpose of workload design~\citep{DBLP:journals/tse/KrishnamurthyRM06,DBLP:conf/fast/YadwadkarBGNS10,DBLP:journals/ase/SyerSJH17}, resources control~\citep{DBLP:conf/cnsm/GongGW10,DBLP:conf/sosp/CortezBMRFB17}, configuration selection~\citep{DBLP:conf/kbse/GuoCASW13,DBLP:conf/wosp/ValovPGFC17,DBLP:journals/ese/GuoYSASVCWY18}, and anomaly detection~\citep{DBLP:journals/csur/IbidunmoyeHE15,DBLP:conf/issre/FarshchiSWG15,DBLP:journals/stvr/GhaithWPJOM16}. Performance models can be divided into two categories~\citep{DBLP:conf/wosp/DidonaQRT15}. One is white box performance models, which is also called analytical models. White box performance models predict performance based on the assumption of system contexts, i.e., workload intensity and service demand.
 
-%\subsection{Black-box performance model}
-Another type of performance models is black-box performance models. Black-box performance models employ statistical modeling or machine learning techniques to predict system performance by taking the system as a black box.
-Black-box performance models typically require no knowledge about the system internal behavior~\citep{DBLP:conf/wosp/DidonaQRT15,DBLP:conf/icst/GaoJBL16}. Such models apply various machine learning algorithms to model a system's performance behavior taking system execution logs or performance metrics as input. 
+Another type of performance models are black-box performance models. Black-box performance models employ statistical modeling or machine learning techniques to predict system performance by taking the system as a black box.
+Black-box performance models typically require no knowledge about the system's internal behavior~\citep{DBLP:conf/wosp/DidonaQRT15,DBLP:conf/icst/GaoJBL16}. Such models apply various machine learning algorithms to model a system's performance behavior taking system execution logs or performance metrics as input. 
 
 Typical examples of black-box performance models are linear regression models~\citep{DBLP:conf/wosp/ShangHNF15, Yao:2018:LSL:3184407.3184416}. 
 For example, prior studies use linear regression models to capture the relationship between a target performance metric (e.g., CPU usage) and the system operations~\citep{Yao:2018:LSL:3184407.3184416} or other performance metrics (e.g., memory utilization)~\citep{DBLP:conf/wosp/ShangHNF15}:
 \begin{equation}
 y=\alpha + \beta_1 x_1 + \beta_2 x_2+...+\beta_n x_n
 \end{equation}
-where the response variable $y$ is the target performance metric, while the explanatory variables ( $x_1,x_2,...,x_n$) are the frequency of each operation of the system~\citep{Yao:2018:LSL:3184407.3184416} or each of the other performance metrics~\citep{DBLP:conf/wosp/ShangHNF15}.
+where the response variable $y$ is the target performance metric, while the explanatory variables ($x_1,x_2,...,x_n$) are the frequency of each operation of the system~\citep{Yao:2018:LSL:3184407.3184416} or each of the other performance metrics~\citep{DBLP:conf/wosp/ShangHNF15}.
 The coefficients $\beta_1,\beta_2,...,\beta_n$ describe the relationship between the target performance metric and the corresponding explanatory variables.  
 
 Linear regression requires that the input data satisfies a normal distribution. With the benefit of being applicable to data from any distribution, regression tree~\citep{DBLP:conf/wosp/XiongPZG13} has been used to model system performance. Regression tree models a system's performance behavior by using a tree-liked structure. Quantile regression~\citep{DBLP:conf/asplos/OliveiraFDHS13} can model a system's different phases of performance behavior.
