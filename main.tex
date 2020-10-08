@@ -40,9 +40,9 @@
 
 \hypersetup{
   colorlinks,
-  citecolor=blue,
-  linkcolor=red,
-  urlcolor=purple}
+  citecolor=Blue,
+  linkcolor=Red,
+  urlcolor=Purple}
 
 \definecolor{custom-gray}{cmyk}{0, 0, 0, 0.7, 1.00}
 \newtcbtheorem[no counter]{Summary}{\hskip-0.97em}{enhanced,drop shadow={black!50!white},
@@ -62,7 +62,7 @@
 \newcommand{\PQI}{How common are \inconsistent issues? }
 \newcommand{\PQII}{How difficult is it to manually identify \inconsistent issues?}
 
-\newcommand{\RQI}{What is the impact of configuration on performance regression?}
+\newcommand{\RQI}{What is the impact of configuration on the performance regression?}
 \newcommand{\RQII}{How accurately can we predict \inconsistent issues? }
 \newcommand{\RQIII}{What are the most important metrics for predicting \inconsistent issues? }
 
@@ -73,18 +73,14 @@
 
 \maketitle
 \begin{abstract}
-Maintaining a good performance of a software system is a primordial task when evolving a software system. The performance regression issues are among the dominant problems that large software systems face. In addition, these large systems tend to be highly configurable, which allows users to change the behaviour of these systems by simply altering the values of certain configuration options. However, such flexibility comes with a cost. In fact, such software systems suffer throughout their evolution from what we refer to as ``Inconsistent Option Performance Variation'' (\textbf{\inconsistent}). An \inconsistent indicates, for a given commit, that the performance regression or improvement of different values of the same configuration option is inconsistent compared to the prior commit% when altering the values of the same option
-. For instance, a new change might not suffer from any performance regression under the default configuration (i.e., when all the options are set to their default values), while altering one option's value manifests a hidden regression. %\bram{what is that?}. 
-Hidden regression is that performance regression occurs in non-default value but not in default value of the same configuration option. Similarly, when developers improve the performance of their systems, performance regression might be manifested under a subset of the existing configurations. %\bram{unclear}. 
-Unfortunately, such hidden regressions are harmful as they can go unseen to the production environment. %While a software system does not show any performance regression under the default configuration, other configurations might hide a performance regression that can go as unseen to the production environment. Similarly, a software performance improvement might be manifested under one configuration (e.g., the default configuration), while other configurations can hide a performance regression. 
+Maintaining a good performance of a software system is a primordial task when evolving a software system. The performance regression issues are among the dominant problems that large software systems face. In addition, these large systems tend to be highly configurable, which allows users to change the behaviour of these systems by simply altering the values of certain configuration options. However, such flexibility comes with a cost. In fact, such software systems suffer throughout their evolution from what we refer to as ``Inconsistent Options Performance Variation'' (\textbf{\inconsistent}). An \inconsistent indicates, for a given commit, that a performance regression or improvement is inconsistent when altering the values of the same option. For instance, a new change might not suffer from any performance regression under the default configuration (i.e., when all the options are set to their default values), while altering one option's value manifest a hidden regression. Similarly, when developers improve the performance of their systems, performance regression might be manifested under a subset of the existing configurations. Unfortunately, such hidden regressions are harmful as they can go unseen to the production environment. %While a software system does not show any performance regression under the default configuration, other configurations might hide a performance regression that can go as unseen to the production environment. Similarly, a software performance improvement might be manifested under one configuration (e.g., the default configuration), while other configurations can hide a performance regression. 
 %In other words, . 
-In this paper, we first quantify how prevalent (in)consistent performance regression or improvement is among the values of an option. %we first quantify the impact of configuration on the performance regression of highly configurable software systems. 
-In particular, we study over 803 \emph{Hadoop} and 502 \emph{Cassandra} commits, for which we execute a total of 4,902 and 4,197 tests, respectively, amounting to 12,536 machine hours of testing. %For example,\bram{come back here} one of that option's value manifests an improvement compared to the prior commit, and another value of the same option manifests a performance regression instead. %  whose performance is inconsistent through different values. % with a performance regression, including these \med{that are hidden under a non-default configuration?}. 
+In this paper, we first quantify how consistent is a performance regression or improvement among the values of an option. %we first quantify the impact of configuration on the performance regression of highly configurable software systems. 
+In particular, we study over 803 and 502 \emph{Hadoop} and \emph{Cassandra} commits, for which we execute a total of 4,902 and 4,197 tests, respectively. Then, we propose a prediction model that identifies whether a commit, test, and an option (\textbf{\instance}) manifest an \inconsistent. For example, one of that option's value manifests an improvement compared to the prior commit, and another value of the same option manifests a performance regression instead. %  whose performance is inconsistent through different values. % with a performance regression, including these \med{that are hidden under a non-default configuration?}. 
 We observe that \inconsistent is a common problem that is difficult to manually predict. 69\% and 93\% of the \emph{Hadoop} and \emph{Cassandra} commits have at least one configuration that hides a performance regression. 
-Worse, most of the commits have different options or tests leading to \inconsistent and hiding performance regressions.
-Therefore, we propose a explanatory model that identifies whether a given combination of commit, test, and option (\textbf{\instance} value) manifests an \inconsistent.  % we build models \bram{again? or same model? come back} to automatically detect whether a combination of commit and tested option would manifest \inconsistent. 
-Our evaluation for different models shows that random forest is the best performing classifier, with a median AUC of 0.91 and 0.82 for \emph{Hadoop} and \emph{Cassandra}, respectively. 
-Our findings highlight the importance of considering different configurations when performing performance regression detection, and that leveraging predictive models can mitigate the difficulty of exhaustively considering all configurations of a system during such configuration-aware performance regression detection. 
+Besides, most of the commits do not share similar options or tests that may lead to \inconsistent and hide performance regressions.
+Therefore, we build models to automatically detect whether a combination of commit, tested option would manifest \inconsistent. Our evaluation for different models shows that random forest is the best performing classifier, with a median AUC of 0.91 and 0.82 for \emph{Hadoop} and \emph{Cassandra}, respectively. 
+Our findings highlight the importance of considering different configurations when performing performance regression detection, and that leveraging predictive models can mitigate the difficulty of exhaustively consideration all of configurations of a system during such configuration-aware performance regression detection. 
 %We expect that our study inspire a wide spectrum of future studies on configuration-aware performance regression detection.
 \keywords{Software Performance \and Performance Evolution \and Highly configurable software systems}
 

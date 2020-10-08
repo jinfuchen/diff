@@ -5,31 +5,27 @@
 %\heng{Go through RQ3}
 
 \subsubsection*{Motivation}
-The goal of this research question is to analyze the models (of RQ1) that predict the \inconsistent to understand the factors that play the most important role in determining whether an option could manifest an \inconsistent. % the impact of adjusting a configuration parameter
-In particular, we focus on the random forest model with code embeddings, as it shows the best performance in predicting \inconsistent. 
+The goal of this research question is to analyze the models (of RQ1) that predict the \inconsistent to understand the factors that play important roles in determining the impact of adjusting a configuration parameter. In particular, we focus on the random forest model with code embeddings, as it shows the best performance in predicting \inconsistent. 
 %Our results in RQ2 show that our models can effectively predict the impact of a configuration parameter on the results of performance regression detection.
 %In this RQ, we analyze the models to understand the factors that play important roles in determining the impact of adjusting a configuration parameter.
-Our results can help practitioners understand and identify the scenarios where they need to adjust their configuration parameters during their performance tests.
+Our results can help practitioners understand the scenarios where they need to adjusting their configuration parameters in their performance tests.
 
 \subsubsection*{Approach}
 
-%\bram{should we explain why dimension-level instead of metric-level?}
-There exist more than hundred of metrics in our model. In addition, different projects have different features as the code tokens and configuration options are different. To make our results more generalizable, we measure the important features in the dimension level.
+
 To analyze the most important metrics for predicting \inconsistent, we consider the following experiments:
 %In this RQ, we study the influence of the used metrics in our models that predict the impact of a configuration parameter on performance regression detection. We consider the best model (RF with code embeddings) and analyze the influential metrics in the model.
 
 %\med{Todo: make noindent consistent throughout the whole paper}
 \noindent\textbf{Measuring the importance of each dimension of metrics by removing the dimension from the model.} 
 %\med{I think we should drop this, it doesn't show a big difference. what do you think?}
-In order to study the importance of each dimension of metrics, we build a model with all dimensions and compare it to a model with one dropped dimension at a time. That comparison consists of statistically comparing both models' AUC values. The larger the difference is for a dimension, the more important that dimension is. %Then \bram{wasn't this done already in previous sentence, or what is difference?}, we compare the differences between the model with all dimensions and each of the other models that drop one dimension at a time. 
+In order to study the importance of each dimension of metrics, we build a model with all the dimensions and compare it to a model with one dropped dimension at a time. That comparison consists of statistically comparing both models' AUC values. The larger the difference is for a dimension, the more important that dimension is. Then, we compare the differences between the model with all dimensions and each of the other models that drop one dimension at a time. 
 
 %the dimension from our original data and rebuild the model. We then measure the performance of the resulting model and compare it to the original model in terms of AUC value. The more the AUC values decrease, the more important the dimension of metrics is. 
 
 \noindent\textbf{Measuring the importance of each dimension of metrics by only keeping the dimension in the model.} 
 Since metrics from different dimensions can be correlated, we also consider comparing models that are built using one dimension at a time. %However, there might exist correlation between different dimensions of metrics. 
-For example, some tokens from the code token dimension can be correlated with tokens from the configuration dimension. Therefore, we build a model using one dimension at a time, which results in four models. 
-
-Finally, for each model with different dimensions of metrics, we have ten values of AUC since we use 10-fold cross validation. We compare all these models based on their respective AUC values.  In particular, we use the \emph{Mean Decrease Accuracy}~\cite{breiman2001random} to examine whether there is statistically significant difference between the original model with all dimensions of metrics and other models. %\bram{wouldn't RQ1 have already shown this, or why still necessary to do this analysis?}
+For example, some tokens from the code token dimension can be correlated with tokens from the configuration dimension. Therefore, we build a model using one dimension at a time, which results in four models. We compare these models based on their respective AUC values. 
 %keep only one dimension metrics to build random forest model. We then compare the performance of the resulting model to the original model. 
 
 %\heng{Do we need to do the importance of individual metrics?}
@@ -153,14 +149,11 @@ different from the model that combines all the metrics. %\med{just drop table 10
 \end{table}
 
 %\med{to double check if this is correct:}
-\textbf{The code token and configuration dimensions show the best performance among the four dimensions of metrics.} Figures~\ref{fig:importance-dimenssion-keep-hadoop} and \ref{fig:importance-dimenssion-keep-cassandra} show the results of keeping only one dimension of metrics. For both \emph{Hadoop} and \emph{Cassandra}, for all the performance measures, using only the code token metrics or the configuration metrics in the model achieves a better AUC than using other single dimension of metrics, except that the configuration dimension leads to a relatively worse performance for the I/O write measure of \emph{Cassandra}.
-The results indicate that the context of the change as well as the goal of configuration options expressed through their tokens are the most important predictors for \inconsistent. %\bram{was statistical test performed here to find that differences are significant?}
-
-However, when we exclude one dimension of metrics from the model (Figures~\ref{fig:importance-dimenssion-remove-hadoop} and~\ref{fig:importance-dimenssion-remove-cassandra}), the resulting differences % from excluding each dimension
-are less significant, and removing the code tokens and the configuration dimensions in fact does not lead to the worst performance.
-For example, removing the code change dimension from the model for the response time measure of \emph{Hadoop} actually leads to a worse performance than removing the code tokens dimension. 
-This is because the different dimensions of metrics are highly correlated even after correlation analysis, %\bram{even after the filtering steps?}, 
-thus the impact of removing one dimension of metrics may be partially mitigated by other dimensions of metrics.
+\textbf{The code token and configuration dimensions show the best performance among the four dimensions of metrics.} Figure~\ref{fig:importance-dimenssion-keep-hadoop}, \ref{fig:importance-dimenssion-keep-cassandra} show the results of keeping only one dimension of metrics. For both \emph{Hadoop} and \emph{Cassandra}, for all the performance measures, using only the code token metrics or the configuration metrics in the model achieves a better AUC than using other single dimension of metrics, except that the configuration dimension leads to a relatively worse performance for the I/O write measure of \emph{Cassandra}.
+The results indicate that the context of the change as well as the goal of configuration options expressed through their tokens are the most important predictors for \inconsistent.
+However, when exclude each dimension of metrics from the model (Figures~\ref{fig:importance-dimenssion-remove-hadoop} and~\ref{fig:importance-dimenssion-remove-cassandra}), the differences resulting from excluding each dimension are less significant, and removing the code tokens and the configuration dimensions may not lead to the worst performance.
+For example, removing the code change dimension from the model for the response time measure of \emph{Hadoop} actually lead to a worse performance than removing the code tokens dimension. 
+This is because the different dimensions of metrics are highly correlated, thus the impact of removing one dimension of metrics may be partially mitigated by other dimensions of metrics.
 
 \begin{figure}[t]
 	\centering
@@ -332,9 +325,3 @@ The results of average rank of the top important individual metrics is shown in 
 \begin{Summary}{Summary of RQ2}{}
 Every dimension of metrics plays an statistically significant role in predicting whether a \instance manifests a \inconsistent problem. The most important dimensions are related to code tokens and configurations. 
 \end{Summary}
-
-
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: "../main"
-%%% End:
