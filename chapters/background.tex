@@ -1,0 +1,37 @@
+
+\section{Background}
+\label{sec:back}
+
+
+%\subsection{Configuration}
+
+Software configuration is a mechanism used to customize the behaviour of a software system without changing the source code. The configuration \textbf{options} are often stored in configuration files as a set of key - value pairs, where the key represents an option's name and the \textbf{value} represents a default or user-chosen value for that option. We define a \textbf{configuration} as one particular assignment of a value to all existing options. Table~\ref{tab:terms} lists the definition of these terms. For example, \emph{A=1} and \emph{B=2} is one possible configuration for a software system with the two integer options \emph{A} and \emph{B}. Configuration options enable users to adapt the execution of their software systems by simply modifying the values of certain configuration options, without re-compilation. For example, a user can change the directory that stores the cache for \emph{Cassandra} by changing the value of the \textit{saved\_caches\_directory} configuration option.% Such configuration can be changed at run-time without changing or recompiling the source code of the whole software system.
+
+\begin{table}[t]
+    \centering
+    \caption{Our definition of configuration, option, and value}
+    \begin{tabular}{l|p{6.6cm}|l}
+        \hline
+        Term & Definition & Example \\
+        \hline
+        \textbf{Option}  & A typed, configurable item that allows users to set different values. & $A$ \\
+        \textbf{Value} & A specific assignment of a value for an option. & $A = 1$ \\
+        \textbf{Configuration} & An assignment of values to all options by a user. & $A = 1; B = 2$ \\
+        \hline
+    \end{tabular}
+    \label{tab:terms}
+\end{table}
+
+
+Although configuration introduces a large flexibility for users, considering all the possible configurations during testing is impossible. A software system with only three boolean configuration options requires testing 2${^3}$ configurations. In fact, configuration problems are among the dominant %\bram{exaggeration (since one of citations is ours)?} 
+problems in software engineering~\cite{tse,RN2897}.
+
+In particular, a software system can suffer from what we refer to as \textbf{Inconsistent Options Performance Variation} (a.k.a, \inconsistent). This occurs when, for a given commit \emph{C}, the performance of a subset of an option's values evolved differently relative to their performance in the commit prior to \emph{C}. Considering the example in Figure~\ref{fig:description}, when comparing the raw performance of the two option values \emph{V1} and \emph{V2} (Figure~\ref{fig:description-a}), we observe that \emph{V1} shows a better performance than \emph{V2}. However, that might not be problematic as \emph{V2} might just enable an extra feature, such as logging a transaction. In fact, Figure~\ref{fig:description-c} shows that even if \emph{V2} does not show any significant performance variation from the prior commit, \emph{V1} suffers from a performance regression.  
+Similarly, in Figure~\ref{fig:description-d} the performance of \emph{V2} is improved compared to the prior commit, while that improvement does not manifest under option value \emph{V1}. The \inconsistent may directly affect the user experience, increase the resources cost of the system and lead to reputational repercussions. %\bram{here (and also in intro) we need to argue that this is a more important problem than the first one, but right now this is not entirely convincing/concrete enough} %That indicates the first type of \inconsistent, which consists of an inconsistent improvement across different values of the same option. 
+A performance variation is calculated as the difference between the performance variation of each option's value after and before each commit, which is illustrated in Figure~\ref{fig:description} by ``$a - b$'' .
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

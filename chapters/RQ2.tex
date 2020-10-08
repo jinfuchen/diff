@@ -17,7 +17,7 @@
 
 The goal of this research question is to evaluate different classification approaches on predicting for which \instance one has to check multiple option's values. %whether a commit, test, and configuration (i.e., \instance) will spot a performance regression. 
 In our preliminary study, we observe that the \inconsistent is common and hard to manually predict, %is not equally manifested throughout all the configurations. %For instance, even if the default configuration does not show any performance regression, other configurations can badly suffer from a performance regression. %different settings of the configuration options significantly impact the results of performance regression detection. 
-which indicates that developers need to test different values for each option. However, as there are typically a large number of configuration options (e.g., \emph{Hadoop} version 2.7.3 has 355 configuration options) with different possible values, exhaustively experimenting with all different options for each test in performance testing is time and resource-consuming. In this RQ, we aim to reduce the effort of conducting configuration-aware performance testing by predicting the need for adjusting a configuration option for a test when a code change is made (i.e., for a \instance). Specifically, our approach predicts whether a \instance manifests an \inconsistent, such that developers can make an informed decision on whether they should consider different values for that studied option in their performance testing.
+which indicates that developers need to test different values for each option. However, as there are typically a large number of configuration options (e.g., \emph{Hadoop} version 2.7.3 has 355 configuration options) with different possible values, exhaustively experimenting with all different options for each test in performance testing is time- and resource-consuming. In this RQ, we aim to reduce the effort of conducting configuration-aware performance testing by predicting the need for testing with different values for a given configuration option when a code change is made (i.e., for a \instance). Specifically, our approach predicts whether a \instance manifests an \inconsistent, such that developers can make an informed decision on whether they should consider different values for that option in their performance testing.
 
 \subsubsection*{Approach}
 
@@ -27,20 +27,20 @@ Below, we describe the detailed steps involved in our modeling process.
 
 \noindent\textbf{Step 1. Data preparation.}
 
-\textit{Step 1.1. Defining the target variable.} Our target variable is a binary variable that indicates whether an \instance manifests an \inconsistent, which we obtained following the approach discussed in Section~\ref{sec:datacollection}. In particular, after collecting performance measurements, we calculated the performance variation for each option, and discretize each \instance into a \inconsistent or a non \inconsistent following the discretization approach of Section~\ref{sec:statisticalAnalysis}.
+\textit{Step 1.1. Defining the target variable.} Our target variable is a binary variable that indicates whether an \instance manifests an \inconsistent, which we obtained following the approach discussed in Section~\ref{sec:datacollection}. In particular, after collecting performance measurements, we calculated the performance variation for each option, and discretize each \instance into \inconsistent or non-\inconsistent following the discretization approach of Section~\ref{sec:statisticalAnalysis}.
 %For each \instance, we use the maximum difference between the performance regression detection results with different values of a configuration option as the target variable.
 %First, for each \instance, %commit, each test, and each configuration option, 
 %we run performance testing using all different values of the option (repeated 30 times) and record the maximum difference between the performance regression detection results (i.e., the Cliff's delta effect size) using the default option value and other option values.
 
 
-\begin{table}[htbp]
-\tabcolsep=0.06cm
+\begin{table}[t]
+\tabcolsep=0.05cm
 \scriptsize
-\caption{Overview of our selected metrics. %\heng{the code tokens also include tokens from the test file right?}
+\caption{Overview of our selected metrics.%\heng{the code tokens also include tokens from the test file right?}
 }
 \begin{tabular}{|l|l|l|}
 \hline
-Dimension & metric           & rationale \\ \hline
+Dimension & Metric           & Rationale \\ \hline
 \multirow{8}{*}{\begin{tabular}[c]{@{}l@{}}Code \\      change\end{tabular}}    & \begin{tabular}[c]{@{}l@{}}Number   of modified\\      subsystems\end{tabular}   & \begin{tabular}[c]{@{}l@{}}The   more subsystems are changed, the higher risk\\      the change may be~\cite{mockus2000predicting}.\end{tabular}\\ \cline{2-3} 
   & \begin{tabular}[c]{@{}l@{}}Number of modified\\      directories\end{tabular}    & \begin{tabular}[c]{@{}l@{}}Changing   more directories may more likely introduce\\      performance regressions~\cite{mockus2000predicting}.\end{tabular}     \\ \cline{2-3} 
   & \begin{tabular}[c]{@{}l@{}}Number of modified\\      files\end{tabular}          & \begin{tabular}[c]{@{}l@{}}Changing   many source files are more likely to cause\\      performance regressions~\cite{Nagappan:2006:MMP}.\end{tabular}         \\ \cline{2-3} 
@@ -54,38 +54,40 @@ Dimension & metric           & rationale \\ \hline
   & \begin{tabular}[c]{@{}l@{}}Number of called\\      subprograms\end{tabular}      & \begin{tabular}[c]{@{}l@{}}Large   called subprograms will amplify the regression if \\      there exists performance regressions in the called   program~\cite{Nagappan:2006:MMP}.\end{tabular}         \\ \cline{2-3} 
   & \begin{tabular}[c]{@{}l@{}}Number of calling\\      subprograms\end{tabular}     & \begin{tabular}[c]{@{}l@{}}Large   calling subprograms will amplify the regressions if \\      there exists performance regressions in the called   program~\cite{Nagappan:2006:MMP}.\end{tabular}        \\ \hline
 Code token& \begin{tabular}[c]{@{}l@{}}Code   tokens of the\\      changed source code\end{tabular}        & \begin{tabular}[c]{@{}l@{}}Some   code tokens may be more related to performance \\      than other tokens.\end{tabular}          \\ \hline
-\begin{tabular}[c]{@{}l@{}}Configuration\\       option\end{tabular}            & \begin{tabular}[c]{@{}l@{}}Splited   configuration\\      option names\end{tabular}            & \begin{tabular}[c]{@{}l@{}}The   name of configuration option may be related to a \\      specific performance metric.\end{tabular}             \\ \hline
+\begin{tabular}[c]{@{}l@{}}Configuration\\       option\end{tabular}            & \begin{tabular}[c]{@{}l@{}}Split   configuration\\      option names\end{tabular}            & \begin{tabular}[c]{@{}l@{}}The name components of a configuration option may be \\      related to a specific performance metric.\end{tabular}             \\ \hline
 \end{tabular}
 \label{tab:metrics}
 \end{table}
 
 \textit{Step 1.2. Selecting the features.}
 We consider four dimensions of software metrics that are related to the likelihood of a configuration option impacting the performance testing of a code commit for each test (i.e., of an \instance). Table~\ref{tab:metrics} lists the detailed metrics used in our models. %\med{the hypothesis that link the four dimensions to the configuration performance regression doesn't make sense. I would suggest to say that ``
-We already found in our prior work~\cite{jinfu_tse2020} that code structure, and code change dimensions are important for predicting performance regressions, but we did not consider the impact of different configurations on the manifestation of performance regressions. Therefore, we use the prior dimensions as well as an additional dimension about the configuration options.
+We already found in our prior work~\cite{jinfu_tse2020} that code structure, and code change dimensions are important for predicting performance regressions, but there we did not consider the impact of different configurations on the manifestation of performance regressions. Therefore, we use the prior dimensions as well as an additional dimension about the configuration options.
 
 %\med{To reomve the following itemize about the dimensions:}
 %\begin{itemize}
     %\item \heng{todo later: motivate the choice of metrics from RQ1 findings and Jinfu's prior performance regression model}
-    \textbf{Code change metrics}. This dimension contains metrics that capture the code changes in a commit (e.g., the number of changed lines of code). Some code changes (e.g., big code changes) might be more likely to impact how different values of a configuration option make difference in performance testing.
+    \textbf{Code change metrics}. This dimension contains metrics that capture the code changes in a commit (e.g., the number of changed lines of code). Some code changes (e.g., big code changes) might be more likely to impact how different values of a configuration option make a difference in performance testing.
     
-    \textbf{Code structure metrics}. This dimension contains metrics that describe the static structure of the source code files (e.g., Cyclomatic complexity). %\med{not clear why? how a code change is related to a configuration? \jinfu{We have option-test mapping.}}
+    \textbf{Code structure metrics}. This dimension contains metrics that describe the static structure of the source code files (e.g., cyclomatic complexity). %\med{not clear why? how a code change is related to a configuration? \jinfu{We have option-test mapping.}}
     Our intuition is that changing certain code (e.g., complex code) is more likely to alter the performance impact of a configuration option.
     
     \textbf{Code token metrics}. This dimension considers the code tokens of the methods that are changed in the commit and the test file.%\heng{can we separate the tokens from the source code and the test files into two dimensions?}. 
-    Some code tokens (e.g., ``speed'') may be more related the performance than other tokens. We use the \emph{lscp}\footnote{Lscp is a lightweight source code preprocesser that can be used to isolate and manipulate the linguistic data (i.e., identifier names, comments, and string literals) from the source code: \url{https://github.com/doofuslarge/lscp}} tool to extract the code tokens from the source code. 
+    Some code tokens (e.g., ``speed'') may be more related to performance than other tokens. We use the \emph{lscp}\footnote{Lscp is a lightweight source code preprocesser that can be used to isolate and manipulate the linguistic data (i.e., identifier names, comments, and string literals) from the source code: \url{https://github.com/doofuslarge/lscp}} tool to extract the code tokens from the source code. 
     
-    \textbf{Configuration option metrics}. This dimension considers the characteristics of the configuration option (e.g., the tokens in the configuration option). We assume that some options (e.g., system resource-related options) are more likely to impact the performance regressions detection results of a commit.
+    \textbf{Configuration option metrics}. This dimension considers the characteristics of the configuration option, in particular the tokens in the configuration option names. We assume that some options (e.g., system resource-related options) are more likely to impact the performance regressions detection results of a commit.
 %\end{itemize}
 
 
 \textit{Step 1.3. Pre-processing the features.}
-The code token metrics include thousands of unique code tokens. Thus, we need to pre-process such metrics into a numeric representation. We consider three approaches to pre-process the code token metrics. 
+The code token metrics include thousands of unique code tokens. Thus, we need to pre-process such metrics into a numeric representation. We consider three different approaches to pre-process the code token metrics. 
 \begin{itemize}
     \item Term frequency–inverse document frequency (tf-idf). Tf-idf~\cite{ramos2003using} generates a feature for each unique token. The value of a feature for a commit is the term frequency of the corresponding token (i.e., $tf(t,c) = f_{t,c}$, where $f_{t,c}$ is the number of times a token $t$ appears in commit $c$) times the inverse frequency of the commits that contain the token ($idf(t) = \log{(N/N_t)}$, where $N$ is the total number of commits while $N_t$ is the number of commits containing the token $t$.) %heng{to confirm the detailed calculation}
     
-    \item Principal component analysis (PCA). Using tf-idf generates a larger number of features that may lead to very complex models. Therefore, we apply PCA~\cite{wold1987principal} on the features resulted from tf-idf to reduce the number of features. Specifically, we only consider the top principal components that contribute to 95\% of the variance in the features together.
+    \item Principal component analysis (PCA). Using tf-idf generates a large %\bram{than what?} \jinfu{traditional features}
+    number of features that may lead to very complex models. Therefore, we apply PCA~\cite{wold1987principal} on the features resulting from tf-idf to reduce the number of features. Specifically, we only consider the top principal components that contribute to 95\% of the variance in the features together.
     
-    \item Word embeddings. We use word2vec~\cite{Mikolov:2013:DRW:2999792.2999959,Mikolov2013} to code each token into a vector of 128 numerical values. Specifically, we pre-train the embeddings from a large code base\footnote{\url{https://doi.org/10.5281/zenodo.3801975}} then applying the pre-trained embeddings on the tokens in our data. Then we use a mean aggregation of the vectors representing the tokens in a commit.
+    \item Word embeddings. We use word2vec~\cite{Mikolov:2013:DRW:2999792.2999959,Mikolov2013} to code each token into a vector of 128 numerical values. Specifically, we pre-train the embeddings from a large code base\footnote{\url{https://doi.org/10.5281/zenodo.3801975}}, %\bram{is that still anonymous, or are authors known by now?}, 
+    then apply the pre-trained embeddings on the tokens in our data. Then we use a mean aggregation of the vectors representing the tokens in a given commit.
     
     
     
@@ -102,26 +104,26 @@ A random forest is a classifier consisting of a collection of decision tree clas
 %\med{we don't have to say this. somebody might argue why trying all these models when ~\cite{ghotra2015revisiting} already found that random forest is the best}Prior work~\cite{ghotra2015revisiting} compares 31 classifiers in software defects prediction and suggests that random forests outperform other classifiers. %Besides, random forests provide us a way to do sensitivity analysis on the measures so that we can understand the most influential factors in our models~\cite{breiman2002manual,liaw2002classification}.
 A logistic regression is a statistical model that uses a logit function to model a binary variable (the target variable) as a linear combination of the independent variables~\cite{hosmer2013applied}, which is widely used in software analytics~\cite{tantithamthavorn2018impact,shang2015automated}. 
 XGBoost is an efficient and accurate implementation of the gradient boosting algorithm~\cite{chen2016xgboost}, which is reported to perform better than other machine learning models in software engineering applications~\cite{Liao2020LogPerfReg}.
-The neural network model~\cite{DBLP:journals/jmlr/GlorotBB11} used in our study consists of four layers and are trained with 100 batch size, and 10 epochs.
-The CNN model~\cite{DBLP:journals/tnn/LawrenceGTB97} in our study consists of five layers, and are trained with 100 batch size, and 10 epochs.
+The neural network model~\cite{DBLP:journals/jmlr/GlorotBB11} used in our study consists of four layers and are trained with batch size 100, and 10 epochs.
+The CNN model~\cite{DBLP:journals/tnn/LawrenceGTB97} in our study consists of five layers, and are trained with batch size 100, and 10 epochs.
 
 
-Prior to constructing our models, we check the pairwise correlation between our features using the Pearson correlation test (\(\rho\))~\cite{benesty2009pearson}. We choose the Pearson correlation method because it is robust to non-normally distributed data. In this work, we choose the correlation value $0.7$ as the threshold to remove collinearity. In other words, if the correlation between a pair of features is greater than 0.7 (\(|\rho|>0.7\)), we keep one of the two features in the model.
+Prior to constructing our models, we check the pairwise correlation between our features using the Pearson correlation test (\(\rho\))~\cite{benesty2009pearson}. We choose the Pearson correlation method because it is robust to non-normally distributed data. In this work, we choose the correlation value $0.7$ as the threshold to remove collinearity. In other words, if the correlation between a pair of features is greater than 0.7 (\(|\rho|>0.7\)), we only keep one of the two features in the model.
 %\med{what about redundancy analysis?} 
 We then perform redundancy analysis on the features. In particular, we use each feature as a dependent variable and use the remaining features as independent variables to build a regression model and calculate the $R^2$ of each model. If the $R^2$ is more than 0.9~\cite{markASE}, the current dependent variable is considered redundant. 
 
 \noindent\textbf{Step 3. Model evaluation.}
 %\textit{Evaluation metrics.}
 %\textit{Ten-fold cross-validation.}
-We use a 10-fold cross-validation to evaluate the performance of our models.
+We use a 10-fold cross-validation to evaluate the performance of our models. %\bram{did we evaluate actual prediction? if not, we should talk about ``explanatory models'' instead of ``prediction models''}
 In each repetition of the 10-fold cross-validation, the whole data set is randomly partitioned into 10 sets of roughly equal size. One subset is used as the testing set (i.e., the held-out set) and the other nine subsets are used as the training set. 
 We train our models using the training set and evaluate the performance of our models on the held-out set.
 The process repeats 10 times until all subsets are used as a testing set once.
 
-In each fold of the cross-validation, we use precision, recall, and 
+In each fold of the cross-validation, we use precision, recall and 
 AUC to measure the performance of our models.
-Precision measures the ratio of cases when a configuration option actually impacts the performance regressions detection among all the cases that our models predict to adjust a configuration option (i.e., $\frac{\textnormal{true positives}}{\textnormal{true positives} + \textnormal{false positives}}$). Recall measures the ratio of cases when our models predict to adjust a configuration option among all the cases when a configuration option actually impacts the performance regressions detection (i.e., $\frac{\textnormal{true positives}}{\textnormal{true positives} + \textnormal{false negatives}}$). 
-AUC measures our models' ability to discriminate the \instance cases into \inconsistent and non \inconsistent cases. Specifically, AUC is the area under the ROC curve which plots the true positive rate against the false positive rate under different classification thresholds. 
+Precision measures the ratio of cases when a configuration option actually impacts the performance regression detection among all the cases that our models predict to adjust a configuration option (i.e., $\frac{\textnormal{true positives}}{\textnormal{true positives} + \textnormal{false positives}}$). Recall measures the ratio of cases when our models predict to adjust a configuration option among all the cases when a configuration option actually impacts the performance regressions detection (i.e., $\frac{\textnormal{true positives}}{\textnormal{true positives} + \textnormal{false negatives}}$). 
+AUC measures our models' ability to discriminate the \instance cases into \inconsistent and non-\inconsistent cases. Specifically, AUC is the area under the ROC curve, which plots the true positive rate against the false positive rate under different classification thresholds. 
 Prior work recommends the use of AUC over threshold-dependent measures (e.g., precision and recall) when measuring the model performance~\cite{tantithamthavorn18experience}.
 %\med{we should instead say data is not equally distributed, so precision and recall are not good performance metrics + drop precision and recall from the tables.}We also included the evaluation results of other metrics (precision and recall) in our replication package~\heng{to do: add replication package}. \jinfu{After update Precision and recall in NN and CNN, we can keep precision and recall.}
 
@@ -132,8 +134,8 @@ Prior work recommends the use of AUC over threshold-dependent measures (e.g., pr
 %\heng{update the numbers}
 %\heng{We only keep AUC in the paper and put all metrics in the replication package.}
 \begin{table}
-% \tabcolsep=0.1cm
-\caption{\emph{Hadoop}'s results of using different models to predict whether configuration options cause the manifesting of performance regressions. The best results for each performance metric and each model are highlighted in \textit{italic}. The best results for each performance metric across different models are highlighted in \textbf{\textit{bold-italic}}.} %\heng{Still a few results show very low precision and recall but high AUC (e.g., NN with tf-idf on Hadoop for Res. time and CPU, CNN with tf-idf on Hadoop for CPU} \heng{Todo: only keep AUC} \jinfu{Update Table6 and Table7}}
+ \tabcolsep=0.18cm
+\caption{\emph{Hadoop}'s results of using different models to predict whether configuration options cause the manifesting of \inconsistent. The best results for each performance metric and each model are highlighted in \textit{italic}. The best results for each performance metric across different models are highlighted in \textbf{\textit{bold-italic}}.} %\heng{Still a few results show very low precision and recall but high AUC (e.g., NN with tf-idf on Hadoop for Res. time and CPU, CNN with tf-idf on Hadoop for CPU} \heng{Todo: only keep AUC} \jinfu{Update Table6 and Table7}}
 
 \begin{tabular}{|c|r|r|r|r|r|r|r|r|r|}
 \hline
@@ -187,8 +189,8 @@ Average           & 0.31  & 0.43    & 0.71 & 0.16  & 0.69    & 0.71 & 0.29  & 0.
 
 
 \begin{table}
-% \tabcolsep=0.1cm
-\caption{\emph{Cassandra}'s results of using different models to predict whether configuration options cause the manifesting of performance regression. The best results for each performance metric and each model are highlighted in \textit{italic}. The best results for each performance metric across different models are highlighted in \textbf{\textit{bold-italic}}.}
+\tabcolsep=0.18cm
+\caption{\emph{Cassandra}'s results of using different models to predict whether configuration options cause the manifesting of \inconsistent. The best results for each performance metric and each model are highlighted in \textit{italic}. The best results for each performance metric across different models are highlighted in \textbf{\textit{bold-italic}}.}
 \begin{tabular}{|c|r|r|r|r|r|r|r|r|r|}
 \hline
 \multicolumn{10}{|c|}{Cassandra}          \\ \hline
@@ -238,11 +240,11 @@ Average           & 0.28 & 0.36   & \textit{0.73}            & 0.30 & 0.40   & \
 
 %\med{what about adding (1) a model that predicts when a \instance suffers from an \inconsistent on at least one performance measure and (3) another model on all the performance measures. the goal of this is to simulate different use cases. the first use case (1) is for people who are interested on any performance metric, what (2) we already have is for people who are interested on one precise performance metric, and the (3) is for people who are looking for very bad options that cause problems on all the performance metrics. } \jinfu{If practitioners want to predict whether a \instance suffers from \inconsistent in any of performance metric, practitioners can combine the five predictors. In other words, any of the model in five performance metrics predicts a \instance suffers from \inconsistent.}
 
-\noindent \textbf{Our models can effectively predict when a \instance is manifesting an \inconsistent for all of our five studied performance measures,} as shown in Table~\ref{tab:model_evaluation_hadoop} and Table~\ref{tab:model_evaluation_cassandra}. % show the performance of our models for predicting whether adjusting a configuration option would cause difference in the results of performance regression detection. 
+\noindent \textbf{Our models can effectively explain when a \instance is manifesting an \inconsistent for all of our five studied performance measures,} as shown in Table~\ref{tab:model_evaluation_hadoop} and Table~\ref{tab:model_evaluation_cassandra}. % show the performance of our models for predicting whether adjusting a configuration option would cause difference in the results of performance regression detection. 
 Our best models (i.e., as indicated by the \textbf{\textit{bold-italic}} values) achieve an AUC of 0.85 to 0.94 on the \emph{Hadoop} project and 0.79 to 0.90 on the \emph{Cassandra} project, for different performance metrics.
 For the \emph{Hadoop} project, %~\heng{make the wording system or project consistent throughout the paper}, 
-RF is the best model for four out of the five performance metrics, which achieves an AUC of 0.85 to 0.93. Even if XG shows the best AUC performance for the fifth performance metric (i.e., Response time), the difference between RF and XG is only 0.01. 
-For the \emph{Cassandra} project, RF shows the best performance on three out of five performance metrics. NN shows the best performance on also three performance metrics (Memory and I/O read are the same to RF model). The average AUC of the best NN modle is 0.83 while the average AUC of the best RF model is 0.82. 
+RF is the best model for four out of the five performance metrics, achieving an AUC of 0.85 to 0.93. Even if XG shows the best AUC performance for the fifth performance metric (i.e., Response time), the difference between RF and XG is only 0.01. 
+For the \emph{Cassandra} project, RF shows the best performance on three out of five performance metrics. NN shows the best performance on also three performance metrics (Memory and I/O read have the same performance as the RF model). The average AUC of the best NN model is 0.83, while the average AUC of the best RF model is 0.82. 
 Note that %\med{is the following correct?} 
 NN, on the other side, requires a large amount of resources to train and test a model, while the improvements it shows over RF is trivial.
 CNN shows the best performance on only one performance metric (i.e., with an AUC of 0.79 for the Response time). However, the average AUC of the best CNN model is 0.09 lower than that of RF. 
@@ -257,12 +259,14 @@ In summary, we suggest that developers consider the RF model for predicting when
 Our best models achieve a better performance for the \emph{Hadoop} system 
 %(with an AUC of 0.85 to 0.94) 
 than for the \emph{Cassandra} system. % (with an AUC of 0.79 to 0.90).  %for the Hadoop project (best average AUC is 0.91) and a lower AUC of 0.84 to 0.90 for the Cassandra project (best average AUC is 0.83). 
-As discussed in RQ1, the different commits show more inconsistent $<test, option, \inconsistent>$ triplets (i.e., more dark cells in Figure~\ref{fig:across-commit-cassandra}) in the \emph{Cassandra} system than in the \emph{Hadoop} system, thus it is more difficult to predict \inconsistent for the \emph{Cassandra} system, which could explain the reason that our models perform better for the \emph{Hadoop} project.
+As discussed in RQ1, the different commits show more inconsistent $<$test, option, \inconsistent$>$ triplets (i.e., more dark cells in Figure~\ref{fig:across-commit-cassandra}) in the \emph{Cassandra} system than in the \emph{Hadoop} system, i.e., most of commits different from each other. Therefore, it is more difficult to predict \inconsistent for the \emph{Cassandra} system, which could explain the reason that our models perform better for the \emph{Hadoop} project. %\bram{in that figure for Cassandra, is every commit totally different from each other?} 
 %In particular, for the Hadoop project, our models achieve the best performance for predicting the impact of adjusting configurations on the detection of response time regressions (with best AUC of 0.97) and worst performance on I/O write regressions (with best AUC of 0.85). For the Cassandra project, our models achieve more consistent performance across different performance metrics.
 
-\noindent \textbf{Using different representations of the code tokens significantly impact the performance of our models.} As shown in Table~\ref{tab:model_evaluation_hadoop} and Table~\ref{tab:model_evaluation_cassandra}, for the traditional models (RF, LR, and XG), using code embeddings to represent the code tokens often achieves the best performance, while using PCA usually results in the worst performance. For example, for the \emph{Hadoop} project, the RF model achieves an AUC of 0.85 to 0.93 using code embeddings, 0.82 to 0.93 using tf-idf, and only 0.59 to 0.76 using PCA. The reason for the poor performance of the models using PCA might be that PCA significantly reduced the information in the tokens through dimension reduction, even though we considered the principal components that account for 95\% of the variance in the original variables. 
+\noindent \textbf{The choice of representation of the code tokens significantly impacts the performance of our models.} As shown in Table~\ref{tab:model_evaluation_hadoop} and Table~\ref{tab:model_evaluation_cassandra}, for the traditional models (RF, LR, and XG), using code embeddings to represent the code tokens often achieves the best performance, while using PCA usually results in the worst performance. For example, for the \emph{Hadoop} project, the RF model achieves an AUC of 0.85 to 0.93 using code embeddings, 0.82 to 0.93 using tf-idf, and only 0.59 to 0.76 using PCA. The reason for the poor performance of the models using PCA might be that PCA significantly reduced the information in the tokens through dimension reduction, even though we considered the principal components that account for 95\% of the variance in the original variables.
+
 In contrast, for the deep neural network models (NN and CNN), using PCA to represent the code tokens may achieve better results than the other two representations. For example, for the \emph{Cassandra} project, the CNN model combined with PCA achieves the best AUC for two out of the five performance metrics, across all different models.
-The reason might be that there are much more options in the deep neural network models, while using PCA could could significantly reduce the number of options to be trained.
+The reason might be that there are much more options in our studied systems %\bram{in what sense?} 
+in the deep neural network models, while using PCA could significantly reduce the number of options to be trained.
 
 %\noindent \textbf{Our models can be used to equally predict performance regression introduced by adjusting configuration option in all performance metrics.} By examining the prediction results with all performance metrics, we find that all the performance metrics have similar \emph{AUC}s. 
 %\noindent \textbf{For the Hadoop project, our models achieve the best performance for predicting the impact of adjusting configurations on the detection of response time regressions and worst performance on I/O write regressions. For the Cassandra project, our models achieve more consistent performance across different performance metrics.} As shown in Table~\ref{tab:model_evaluation_hadoop} and Table~\ref{tab:model_evaluation_cassandra}, for the Hadoop project, our best models achieve an AUC of 0.97 for the response time metric and an AUC of 0.85 for the I/O write metric. 
@@ -279,3 +283,9 @@ The reason might be that there are much more options in the deep neural network 
 \begin{Summary}{Summary of RQ1}{}
 Our models can effectively predict whether a \instance manifests an \inconsistent problem. Random forest based on code embedding shows the best performance on predicting \inconsistent for most of the performance measures.
 \end{Summary}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
