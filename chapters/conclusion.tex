@@ -1,0 +1,19 @@
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+Highly configurable software systems tend to have a large amount of existing options, which makes testing all the possible configurations infeasible. That can, unfortunately, hide performance regression issues, which can go to the production as unseen. Furthermore, a developer might improve the performance of a software system, while the improvement might not be manifested when altering certain options' values. In fact, the performance improvement or regression of a software change might not be equally manifested through all the possible configuration options' values, which we refer to as the Inconsistent Options Performance Variation (\inconsistent). 
+In this paper, %we first quantify the prevalence of such \inconsistent, and the difficulty to identify an option that manifests an \inconsistent. 
+we observe that \inconsistent is a common problem, which is difficult to manually identify without running exhaustive tests, because most of the commits do not share similar options or tests that may lead to \inconsistent and hide performance regressions.
+We also observed that predictive models (e.g., RF) can effectively predict the \inconsistent problems using four dimension of metrics that are related to code changes, code structures, code tokens, and configurations. 
+Our findings highlight the importance of considering different configurations when performing performance regression detection, and that leveraging predictive models can mitigate the difficulty of exhaustively consider all configurations of a system during such a process. 
+We expect that our study inspire a wide spectrum of future studies on configuration-aware performance regression detection.
+%For instance, we observe that 81\% of the commits suffer from at least one option that suffers from the \inconsistent problem. 
+%We also observe that most of the commits do not share similar options or tests that may lead to \inconsistent and hide performance regressions. %, and when they do so, the same options show different manifestations for \inconsistent (a few commits show an \inconsistent for that option, while other commits does not). 
+
+%In this paper, we first quantify the regression that can be caused by the configuration options of a software system. Secondly, we propose a machine learning model to predict commits with a regression hidden with a configuration. 
+
+%For instance, we observe that 69\% and 93\% of the Hadoop and Cassandra commits have at least one option with a performance regression (i.e., the performance of the current revision is statistically significantly different from the prior revision). Such regression issues have impact on different performance metrics, including the response time, CPU, memory, I/O read, and I/O write. 
+
+%We then proposed and evaluated different prediction models to identify the \inconsistent issues. Our models use code change, code structure, code tokens, and configuration related metrics as independent metrics to predict \inconsistent based on five performance metrics (i.e., Response time, CPU, memory, I/O read, and I/O write). We observe that our models reach an AUC up to 0.94 for Hadoop and 0.90 for Cassandra. The most important metrics for our prediction are related to the code tokens and configuration dimensions. 
+

@@ -1,0 +1,77 @@
+\documentclass[smallextended]{svjour3}       % onecolumn (second format)
+%\documentclass[twocolumn]{svjour3}   
+%\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{lipsum}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+    
+\begin{document}
+
+\title{On the Impact of Configuration Options on Performance Regression}
+
+\newcommand{\RQI}{How many performance regression are hidden by a software system variability? }
+\ian{I am on this one}
+\newcommand{\RQII}{How often a configuration option can be responsible for a performance regression?}
+\newcommand{\RQIII}{After how long developers fix a configuration option performance regression? And how do they fix it?}
+
+\author{\IEEEauthorblockN{}
+\IEEEauthorblockA{}
+}
+
+\maketitle
+\begin{abstract}
+
+
+
+\end{abstract}
+
+RQ1: \RQI
+\input{RQ1}
+
+The goal of this research question is to show if there are some configuration options that hide a performance regression. That is when a test can show a performance regression just under some specific configurations. Therefore, it is not enough to test the changed code, but one has to test it under different configurations. 
+
+In other words, this RQ extends [icsme'17] findings by defining three categories of tests: tests without any performance regression, tests with performance regression, and tests with performance regression hidden by configurations. 
+
+RQ2: \RQII
+
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{Figures/evolution.pdf}
+    \caption{The evolution of the impact of an option on performance.}
+    \label{fig:evolution}
+\end{figure}
+
+
+The goal of this research question is to better understand when a configuration option shows a pick in the performance degradation. Such a findings can indicate development patterns that lead to a performance degradation. For example, Figure~\ref{fig:evolution} shows the impact of an option on the performance. Basically, that option has no impact on the performance except on two versions, so it will be interesting to see what happens on these two commits. 
+
+RQ3: \RQIII
+
+An option can suddenly show a pick in the performance, the goal of this research question is to better understand when developers fix that pick: is it immediately, after a while, in the same release, or in next release, .... This research question can also study how developers fix that performance regression. Figure~\ref{fig:evolution} shows that developers fixed that two performance regression immediately.   
+
+
+\section{Related Work}
+
+https://arxiv.org/abs/1710.07980:
+\begin{itemize}
+    \item "We built a testing scaffold for the 26,000+ configurations of JHipster using a cluster of 80 machines during 4 nights for a total of 4,376 hours (182 days) CPU time"
+\end{itemize}
+
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{ConfigSLR}
+
+
+\end{document}
