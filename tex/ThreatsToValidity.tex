@@ -7,7 +7,10 @@ In this section, we discuss the threats to the validity of our study.
 However, we found motivating results on the prevalence of \inconsistent and the performance of our prediction model, which can be replicated by future studies on other software systems. % can evaluate our approach and findings on commercial software systems with other languages. 
 
 \noindent \textbf{Internal validity.}
-An internal threat to validity concerns the performance metrics that we consider. In our approach, we collect five popular performance metrics, i.e., Response time, CPU, Memory, I/O read and write, while other performance metrics such as throughput can still be explored by future research.% can choose other performance metrics to complement our study. 
+When we collect our commits data, We only consider the last commit, if multiple commits are associated with the same issue. We may miss some commits with code changes. Future work can study the difference if considering all the commits.
+
+Another internal threat to validity concerns the performance metrics that we consider. In our approach, we collect five popular performance metrics, i.e., Response time, CPU, Memory, I/O read and write, while other performance metrics such as throughput can still be explored by future research.% can choose other performance metrics to complement our study. 
+
 
 Similarly, our prediction model does not cover all the possible dimensions of metrics. For example, we do not consider a developer dimension. However, our model shows a good AUC performance to predict whether a \instance manifests an \inconsistent. Future studies can explore more dimensions of metrics to improve the performance of our models. 
 
@@ -20,4 +23,4 @@ Finally, our evaluation considers just the traditional models (i.e., logistic re
 
 \noindent \textbf{Construct validity.} %Our evaluation is based on the stability and correctness of collected performance data. The quality and correctness of recorded performance data can impact our study. We assume that the performance monitoring tool named \emph{psutil} can accurately capture performance metrics. \emph{psutil} has been widely used in software performance study~\cite{DBLP:conf/icsm/AlghmadiSSH16, DBLP:conf/icsm/ChenS17}. 
 There might exist environmental performance noise when we use \emph{psutil} to capture the performance data. To minimize the noise, we capture the performance of the corresponding Linux process of the running tests. Furthermore, for each test, we repeat the execution 30 times independently. %\med{is this correct?}
-Finally, we run all of our experiments in the environments with the same configurations \bram{what does ``configuration'' mean here?}.
+Finally, we run all of our experiments in the same environments. %\bram{what does ``configuration'' mean here?}.

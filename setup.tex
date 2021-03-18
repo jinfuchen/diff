@@ -1,0 +1,57 @@
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{lipsum}
+% \usepackage{subfigure}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{longtable}
+
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\usepackage{xspace}
+\newcommand{\instance}{{\em CTO}\xspace}
+\newcommand{\inconsistent}{{\em IoPV}\xspace}
+
+\newcommand{\ian}[1]{\textcolor{red}{{\it [Ian says: #1]}}}
+\newcommand{\bram}[1]{\textcolor{orange}{{\it [Bram says: #1]}}}
+\newcommand{\heng}[1]{\textcolor{blue}{{\it [Heng says: #1]}}}
+\newcommand{\med}[1]{\textcolor{cyan}{{\it [Mohammed says: #1]}}}
+\newcommand{\jinfu}[1]{\textcolor{purple}{{\it [Jinfu says: #1]}}}
+% \newcommand{\heng}[1]{\textcolor{green}{{\it [Heng says: #1]}}}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+    
+    
+\usepackage[most]{tcolorbox}
+
+\hypersetup{
+  colorlinks,
+  citecolor=blue,
+  linkcolor=red,
+  urlcolor=purple}
+
+\definecolor{custom-gray}{cmyk}{0, 0, 0, 0.7, 1.00}
+\newtcbtheorem[no counter]{Summary}{\hskip-0.97em}{enhanced,drop shadow={black!50!white},
+  coltitle=white,
+  top=0.15in,
+  attach boxed title to top left=
+  {xshift=1.5em,yshift=-\tcboxedtitleheight/2},
+  boxed title style={size=small,colback=custom-gray}
+}{summary}
+
+\newcommand{\PQI}{How common are \inconsistent issues? }
+\newcommand{\PQII}{How difficult is it to manually identify \inconsistent issues?}
+
+\newcommand{\RQI}{What is the impact of configuration on performance regression?}
+\newcommand{\RQII}{How accurately can we predict \inconsistent issues? }
+\newcommand{\RQIII}{What are the most important metrics for predicting \inconsistent issues? }

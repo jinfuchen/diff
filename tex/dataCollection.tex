@@ -16,9 +16,10 @@ subject systems. % of our case study.
 \begin{table}[t]
   \centering
   %\tiny
+  \tabcolsep=0.06cm
   \caption{Our studied dataset.}%Overview of our subject systems.}
 	\label{tab:subject}
-    \begin{tabular}{|c|r|l|r|r|r|}
+    \begin{tabular}{|c|r|r|r|r|r|}
     \hline
     Subjects & \multicolumn{1}{c|}{\specialcell{\# Studied\\Releases}} & \multicolumn{1}{c|}{Last release} &  \multicolumn{1}{c|}{\# Commits} & \multicolumn{1}{c|}{\specialcell{\# Configuration\\Options}} & \multicolumn{1}{c|}{\# Tests} \\ \hline
     Hadoop & 7     & 2.7.3 & 803 & 365   & 1,853 \\ \hline
@@ -34,7 +35,7 @@ To answer our research questions, we followed the approach that is summarized in
 \begin{figure*}[t]
 	\centering
 		\includegraphics[width=.9\textwidth]{Figures/overview.pdf}
-	\caption{An overview of our approach to collect data. \bram{what is CTO?}} 
+	\caption{An overview of our approach to collect data. \instance is a combination of a Commit, a Test, and an Option.} %\bram{what is CTO?}} 
 	\label{fig:overview} 
 \end{figure*}
 
@@ -42,7 +43,7 @@ To answer our research questions, we followed the approach that is summarized in
 
 Since we study performance variation across different versions of a software system, we only consider source code related changes. In particular, we filter out commits without any \emph{java} source code changes. % after cloning the Git repositories. 
 Furthermore, %multiple commits might be associated with the same feature or issue. In particular, 
-developers can commit multiple changes toward fixing the same issue, which is defined in the issue tracking system. As \emph{Hadoop} and \emph{Cassandra} use JIRA as issue tracking system and have an explicit mapping between commits and issues, we use the issue ID mentioned in the commit messages to identify the commits that belong to the same issue. If multiple commits are associated with the same issue, we only consider the last commit. This is important as developers can initially introduce a regression but then fix it before releasing the code changes related to the issue. \bram{did we add this to threats section?}
+developers can commit multiple changes toward fixing the same issue, which is defined in the issue tracking system. As \emph{Hadoop} and \emph{Cassandra} use JIRA as their issue tracking system and have an explicit mapping between commits and issues, we use the issue ID mentioned in the commit messages to identify the commits that belong to the same issue. If multiple commits are associated with the same issue, we only consider the last commit. This is important as developers can initially introduce a regression but then fix it before releasing the code changes related to the issue. %\bram{did we add this to threats section?}
 
 
 %In the first step, we filter commits that only have source code changes. In particular, we clone our subject systems from Github repository. Then we checkout to each commit and use \emph{git log} command to list all the files that are changed in each commit. In our subject systems, we extract the commits that have source code changes changes to \emph{java} files. To accomplish one development task, multiple commits, including temporary commits, may be made. We would like to avoid considering such temporary commits. Since all our subject systems use JIRA as their issue tracking systems, we use the issue id mentioned in their commit messages to identify commits that belong to the same issue. If multiple commits are associated with the same issue, we only consider the last commit.
@@ -50,7 +51,7 @@ developers can commit multiple changes toward fixing the same issue, which is de
 \subsubsection{Extracting Options}
 
 In the second step, we extract configuration options and their corresponding values for each subject system (i.e., 355 and 162 configuration options in the last studied releases of \emph{Hadoop} and \emph{Cassandra}, respectively). %There exist hundreds of configuration options in \emph{Hadoop} and \emph{Cassandra}. In particular, there are 355 and 162 configuration options in the last release of \emph{Hadoop} and \emph{Cassandra}, respectively. 
-We obtain option names and default values by crawling the documentation of \emph{Hadoop}\footnote{\url{https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/core-default.xml}} and \emph{Cassandra}\footnote{\url{https://cassandra.apache.org/doc/latest/configuration}}, by and extracting the configuration file that is shipped with the project's releases. Finally, we manually classified the extracted options based on their expected data types (e.g., Boolean when the default value is \emph{TRUE} or \emph{FALSE}).
+We obtain option names and default values by crawling the documentation of \emph{Hadoop}\footnote{\url{https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/core-default.xml}} and \emph{Cassandra}\footnote{\url{https://cassandra.apache.org/doc/latest/configuration}}, by extracting the configuration file that is shipped with the project's releases. Finally, we manually classified the extracted options based on their expected data types (e.g., Boolean when the default value is \emph{TRUE} or \emph{FALSE}).
 
 %Therefore, to collect all the option names, we develop a crawler in Python to gather options from the official configuration website of \emph{Hadoop} and \emph{Cassandra}\footnote{\url{https://cassandra.apache.org/doc/latest/configuration}}.
 %We also extract the type and values of options. For each option, we extract its default value and manually divide its type into boolean, numeric, and enumerated string. 
@@ -60,12 +61,12 @@ We obtain option names and default values by crawling the documentation of \emph
 \label{sec:impactedtests}
 We automatically create a mapping between the changed source code in each commit and the existing unit tests. %%a mapping between the existing unit tests and %correspondingly 
 %the changed source code for that commit. 
-We derive such commit-test mapping based on the automatically generated method-level code coverage results, similar to our prior study~\cite{jinfu_tse2020}. \bram{is this explained next?}
+We derive such commit-test mapping based on the automatically generated method-level code coverage results, similar to our prior study~\cite{jinfu_tse2020}. %\bram{is this explained next?}
 %\med{I see that the two sentences that describe the approach are commented, it looks like we are asking readers to read 2 papers to understand our approach. I still think that we should put it back}
 %for each commit all the changed methods % by adding invocation to logging libraries 
 %and run all the exiting unit tests. The tests that run the instrumented source code are the test that are associated with a commit's change. 
 %\heng{Check if the following is right: } 
-For each commit, we automatically add logging instrumentation to each method that will print log messages that indicate the execution of the method at runtime\footnote{Note that the instrumented versions are only used to identify impacted tests and options, and they are not used in our actual performance evaluation.}.
+For each commit, we use Eclipse JDT~\footnote{\url{https://help.eclipse.org/2020-09/index.jsp}} to automatically add logging instrumentation to each method that will print log messages that indicate the execution of the method at runtime\footnote{Note that the instrumented versions are only used to identify impacted tests and options, and they are not used in our actual performance evaluation.}.
 We then run each test for the commit. A test is considered impacted by the commit if any instrumented logging is output.
 Afterwards, we only run the tests that execute the changed source code for a given commit since executing all the existing tests of a software system for each commit and each possible configuration is practically infeasible. In addition, running those tests that are not impacted by the code change of a commit is not likely to detect performance variations (regressions or improvements under some values of an option). 
 
@@ -85,18 +86,17 @@ Similar to identifying which tests to run for a given commit, we also select whi
 \subsubsection{Evaluating Performance}
 \label{evaluation}
 After obtaining which tests and which options are impacted by each commit, we exercise the test on each commit and its parent commit (i.e., the previous commit) to evaluate their respective performances. %For each test, 
-We first execute each test with all the configuration options set at their default values. Then, we alter the value of one configuration option at a time. For the configuration options with boolean values, we alter the configuration option to the value that is not the default. For example, if the default value is \emph{TRUE}, we would alter the value to be \emph{FALSE}. For numeric type option, we alter the configuration option once to the value that is double the default value and once to half of the default value. For example, if a configuration option has a default value of $100$, we would run the test altering the value to $200$, then run the same test altering the value to $50$. %\ian{I don't understand the next sentence.\med{is it better now?}}
+We first execute each test with all the configuration options set at their default values. Then, we alter the value of one configuration option at a time. For the configuration options with boolean values, we alter the configuration option to the value that is not the default. For example, if the default value is \emph{TRUE}, we would alter the value to be \emph{FALSE}. For the numeric type option, we alter the configuration option once to the value that is double the default value and once to half of the default value. For example, if a configuration option has a default value of $100$, we would run the test altering the value to $200$, then run the same test altering the value to $50$. %\ian{I don't understand the next sentence.\med{is it better now?}}
 For enumeration-typed options, we alter to each of the possible values.% for the enumerate type options. %For enumerated string type option, we execute the same test multiple times, each of which with one of the existing enumerated string values. %Note that we do not execute the tests with the instrumented source code that we discussed in Section~\ref{sec:impactedtests}. 
 
 %We exercise the selected tests with different configurations of each pair of current and parent commits to evaluate their performance. In particular, we execute the same tests with same configuration option in different option values. In terms of different option values, for boolean type option, we execute the same test with \emph{TRUE} and \emph{FALSE} values. For numeric type option, we exetute the test with \emph{default}, 2*\emph{default}, and \emph{default}/2 values. For enumerated string type option, we execute the same test with all the existing enumerated string values.
 
 Our performance evaluation environment uses the Google Compute Engine~\footnote{\url{https://cloud.google.com/compute}} with 8GB memory and 16 cores CPU. In order to generate statistically rigorous performance results, we adopt the practice of repetitive measurements~\cite{peterfse} to evaluate performance. Conservatively, we executed each test 30 times independently, which is larger than prior work that  %since prior research often only 
-repeat a test only 5 to 20 times~\cite{Laaber2018MSR, Leitner2016TIT,DBLP:journals/ese/LaaberSL19}. 
+repeats a test only 5 to 20 times~\cite{Laaber2018MSR, Leitner2016TIT,DBLP:journals/ese/LaaberSL19}. 
 
 To measure the performance that is associated with each test, we %catch the process of each test and 
 use a performance monitoring tool named \emph{psutil}~\footnote{\url{https://github.com/giampaolo/psutil}} (Python system and process utilities). % to capture performance data of such process.
 \emph{Psutil} can capture detailed performance metrics and has been widely used in prior research~\cite{DBLP:conf/icsm/ChenS17,DBLP:conf/wosp/YaoPSSTS18}. We collect both domain level and physical level performance metrics. In our execution, we collect five performance metrics during the execution, i.e., response time, CPU usage, memory usage, I/O read and I/O write.
-
 The entire data collection process took around 12,536 machine-hours.
 
 \subsubsection{Statistical Analyses on Performance Evaluation Results}
@@ -119,68 +119,15 @@ Note that we perform this statistical analysis for each performance metric (i.e.
 \subsubsection{Discretizing \instance into \inconsistent and non-\inconsistent}
 \label{sec:discretizing}
 In the final step, we categorize each commit, test, and option (\instance) into \inconsistent or non-\inconsistent %the maximum difference values into \emph{small} and \emph{large} differences 
-based on an automatically determined threshold. Our intuition is that the maximum difference values would be concentrated in either small values \bram{what values is this referring to?} (i.e., when adjusting a option does not make a difference) or large values (i.e., when adjusting a option does make a difference), which is demonstrated in Figure~\ref{fig:description}. % using the real data from Hadoop version.
+based on an automatically determined threshold. Our intuition is that the maximum difference values (a-b in Figure~\ref{fig:description}) would be concentrated in either small values %\bram{what values is this referring to?} 
+(i.e., when adjusting an option does not make a difference) or large values (i.e., when adjusting an option does make a difference), which is demonstrated in Figure~\ref{fig:description}. % using the real data from Hadoop version.
 
-Specifically, we use Ckmeans.1d.dp~\cite{Ckmeans138:online}, a one-dimensional clustering method, to find a threshold that separates the maximum difference values \bram{of all CTOs? or what is granularity of this clustering?} into two groups, i.e., \inconsistent and non-\inconsistent (see Figure~\ref{fig:threshold_hadoop} and ~\ref{fig:threshold_cassandra}). Note that the option variation ranges between 0, when there is no variation, and 2, when the effect size (cf. Section~\ref{sec:statisticalAnalysis}) is 1 for one option value and -1 for another value of the same option.
+Specifically, we use Ckmeans.1d.dp~\cite{Ckmeans138:online}, a one-dimensional clustering algorithm, to find a threshold that separates the maximum difference values of all \emph{CTO}s %\bram{of all CTOs? or what is granularity of this clustering?} 
+into two groups, i.e., \inconsistent and non-\inconsistent (see Figure 1 and 2 in the appendix). 
+Note that the option variation ranges between 0, when there is no variation, and 2, when the effect size (cf. Section~\ref{sec:statisticalAnalysis}) is 1 for one option value and -1 for another value of the same option.
 
 Most of the thresholds obtained using CKmeans.1d.dp are close to 1. This indicates, as an example, that one option value might show a large performance effect size compared to the prior commit, while another value for the same option does not show any difference from the prior commit (effect size equals to 0). A second example is when one option's value shows a large performance improvement over the prior commit (effect size equals to -1), when another value of the same option does not show any statistically significant difference (effect size equals to 0).
 %The categorized difference values (i.e., \emph{small} or \emph{large}) is our target variable.
-
-\begin{figure}[t]
-	\centering
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/runtime-hadoop-cluster.pdf}
-                \caption{Res. time}
-        \end{subfigure}%
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/cpu-hadoop-cluster.pdf}
-                \caption{CPU}
-        \end{subfigure}%
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/mem-hadoop-cluster.pdf}
-                \caption{Memory}
-        \end{subfigure}%
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/ioread-hadoop-cluster.pdf}
-                \caption{I/O read}
-        \end{subfigure}
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/iowrite-hadoop-cluster.pdf}
-                \caption{I/O write}
-        \end{subfigure}
-        
-	\caption{The automatically obtained thresholds for splitting option variation into \inconsistent and non-\inconsistent groups for \emph{Hadoop}.} % \med{Canssadra or Hadoop? Both fig. 3 and fig. 4 showed Hadoop}.}
-	\label{fig:threshold_hadoop}
-% 	\vspace{-0.15cm}
-\end{figure}
-
-\begin{figure}[t]
-	\centering
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/runtime-cassandra-cluster.pdf}
-                \caption{Res. time}
-        \end{subfigure}%
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/cpu-cassandra-cluster.pdf}
-                \caption{CPU}
-        \end{subfigure}%
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/mem-cassandra-cluster.pdf}
-                \caption{Memory}
-        \end{subfigure}%
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/ioread-cassandra-cluster.pdf}
-                \caption{I/O read}
-        \end{subfigure}
-        \begin{subfigure}{0.19\textwidth}
-                \includegraphics[width=\linewidth]{Figures/iowrite-cassandra-cluster.pdf}
-                \caption{I/O write}
-        \end{subfigure}
-        
-	\caption{The automatically obtained thresholds for splitting option variation into \inconsistent and non-\inconsistent groups for \emph{Cassandra}.} % \med{Canssadra or Hadoop? Both fig. 3 and fig. 4 showed Hadoop}.}
-	\label{fig:threshold_cassandra}
-% 	\vspace{-0.15cm}
-\end{figure}
 
 
 %%% Local Variables:

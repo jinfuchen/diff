@@ -1,104 +1,162 @@
-\documentclass[smallextended]{svjour3}       % onecolumn (second format)
-%\documentclass[twocolumn]{svjour3}   
-%\documentclass[conference]{IEEEtran}
-% \IEEEoverridecommandlockouts
-\usepackage{cite}
-\usepackage{amsmath,amssymb,amsfonts}
-\usepackage{algorithmic}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{xcolor}
-\usepackage[framemethod=TikZ]{mdframed}
-\usepackage{multirow}
-\usepackage{array}
-\usepackage{lipsum}
-% \usepackage{subfigure}
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage{hyperref}
-\usepackage{longtable}
+\documentclass[10pt,journal,compsoc]{IEEEtran}
 
-\newcommand{\specialcell}[2][c]{%
-  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+% *** CITATION PACKAGES ***
+%
+\ifCLASSOPTIONcompsoc
+  % IEEE Computer Society needs nocompress option
+  % requires cite.sty v4.0 or later (November 2003)
+  \usepackage[nocompress]{cite}
+\else
+  % normal IEEE
+  \usepackage{cite}
+\fi
 
-\usepackage{xspace}
-\newcommand{\instance}{{\em CTO}\xspace}
-\newcommand{\inconsistent}{{\em IoPV}\xspace}
+\usepackage[numbers]{natbib}
 
-\newcommand{\ian}[1]{\textcolor{red}{{\it [Ian says: #1]}}}
-\newcommand{\bram}[1]{\textcolor{orange}{{\it [Bram says: #1]}}}
-\newcommand{\heng}[1]{\textcolor{blue}{{\it [Heng says: #1]}}}
-\newcommand{\med}[1]{\textcolor{cyan}{{\it [Mohammed says: #1]}}}
-\newcommand{\jinfu}[1]{\textcolor{purple}{{\it [Jinfu says: #1]}}}
-% \newcommand{\heng}[1]{\textcolor{green}{{\it [Heng says: #1]}}}
+\input{setup}
 
-\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
-    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
-    
-    
-\usepackage[most]{tcolorbox}
+\usepackage{booktabs} % For formal tables
 
-\hypersetup{
-  colorlinks,
-  citecolor=blue,
-  linkcolor=red,
-  urlcolor=purple}
+\usepackage{flushend} % makes the last page balanced
 
-\definecolor{custom-gray}{cmyk}{0, 0, 0, 0.7, 1.00}
-\newtcbtheorem[no counter]{Summary}{\hskip-0.97em}{enhanced,drop shadow={black!50!white},
-  coltitle=white,
-  top=0.15in,
-  attach boxed title to top left=
-  {xshift=1.5em,yshift=-\tcboxedtitleheight/2},
-  boxed title style={size=small,colback=custom-gray}
-}{summary}
+\usepackage{balance}
 
+\usepackage{enumitem}
+\newlist{steps}{enumerate}{1}
+\setlist[steps, 1]{label = Step \arabic*:}
 
-    
-\begin{document}
-
-\title{An Empirical Study on the Inconsistent Options Performance Variation}
-
-\newcommand{\PQI}{How common are \inconsistent issues? }
-\newcommand{\PQII}{How difficult is it to manually identify \inconsistent issues?}
-
-\newcommand{\RQI}{What is the impact of configuration on performance regression?}
-\newcommand{\RQII}{How accurately can we predict \inconsistent issues? }
-\newcommand{\RQIII}{What are the most important metrics for predicting \inconsistent issues? }
-
-\author{
-  % \IEEEauthorblockN{}
-% \IEEEauthorblockA{}
+% code listing
+\usepackage{listings}
+%\usepackage{xcolor}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+	language=Java,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	captionpos=b,
+	columns=flexible,
+	%columns=fullflexible
+	%basicstyle={\small\ttfamily},
+	basicstyle=\linespread{1.1}\footnotesize, 
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3,
+	escapeinside={(*}{*)}
+}
+\lstdefinestyle{interfaces}{
+	float=tp,
+	floatplacement=tbp
 }
 
-\maketitle
-\begin{abstract}
-Maintaining a good performance of a software system is a primordial task when evolving a software system. The performance regression issues are among the dominant problems that large software systems face. In addition, these large systems tend to be highly configurable, which allows users to change the behaviour of these systems by simply altering the values of certain configuration options. However, such flexibility comes with a cost. In fact, such software systems suffer throughout their evolution from what we refer to as ``Inconsistent Option Performance Variation'' (\textbf{\inconsistent}). An \inconsistent indicates, for a given commit, that the performance regression or improvement of different values of the same configuration option is inconsistent compared to the prior commit% when altering the values of the same option
-. For instance, a new change might not suffer from any performance regression under the default configuration (i.e., when all the options are set to their default values), while altering one option's value manifests a hidden regression \bram{what is that?}. Similarly, when developers improve the performance of their systems, performance regression might be manifested under a subset of the existing configurations \bram{unclear}. Unfortunately, such hidden regressions are harmful as they can go unseen to the production environment. %While a software system does not show any performance regression under the default configuration, other configurations might hide a performance regression that can go as unseen to the production environment. Similarly, a software performance improvement might be manifested under one configuration (e.g., the default configuration), while other configurations can hide a performance regression. 
-%In other words, . 
-In this paper, we first quantify how prevalent (in)consistent performance regression or improvement is among the values of an option. %we first quantify the impact of configuration on the performance regression of highly configurable software systems. 
-In particular, we study over 803 \emph{Hadoop} and 502 \emph{Cassandra} commits, for which we execute a total of 4,902 and 4,197 tests, respectively, amounting to \bram{how many?} machine hours of testing. %For example,\bram{come back here} one of that option's value manifests an improvement compared to the prior commit, and another value of the same option manifests a performance regression instead. %  whose performance is inconsistent through different values. % with a performance regression, including these \med{that are hidden under a non-default configuration?}. 
-We observe that \inconsistent is a common problem that is difficult to manually predict. 69\% and 93\% of the \emph{Hadoop} and \emph{Cassandra} commits have at least one configuration that hides a performance regression. 
-Worse, most of the commits have different options or tests leading to \inconsistent and hiding performance regressions.
-Therefore, we propose a prediction model that identifies whether a given combination of commit, test, and option (\textbf{\instance} \bram{value?}) manifests an \inconsistent.  % we build models \bram{again? or same model? come back} to automatically detect whether a combination of commit and tested option would manifest \inconsistent. 
-Our evaluation for different models shows that random forest is the best performing classifier, with a median AUC of 0.91 and 0.82 for \emph{Hadoop} and \emph{Cassandra}, respectively. 
-Our findings highlight the importance of considering different configurations when performing performance regression detection, and that leveraging predictive models can mitigate the difficulty of exhaustively considering all configurations of a system during such configuration-aware performance regression detection. 
-%We expect that our study inspire a wide spectrum of future studies on configuration-aware performance regression detection.
-\keywords{Software Performance \and Performance Evolution \and Highly configurable software systems}
+\newcommand{\specialcell}[2][c]{%
+	\begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+\newcommand{\specialleft}[2][l]{%
+	\begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+\newcommand{\specialright}[2][r]{%
+	\begin{tabular}[#1]{@{}r@{}}#2\end{tabular}}
+	
+\makeatletter
+\newcommand\footnoteref[1]{\protected@xdef\@thefnmark{\ref{#1}}\@footnotemark}
+\makeatother
 
+\usepackage{url}
+\usepackage[flushleft]{threeparttable}
+
+\begin{document}
+
+\title{An Empirical Study on the Inconsistent Option Performance Variation}
+
+\author{
+Jinfu Chen, Mohammed Sayagh, Heng Li, Bram Adams, and Weiyi Shang
+\IEEEcompsocitemizethanks{
+\IEEEcompsocthanksitem Jinfu Chen and Weiyi Shang are with the Department of Computer Science and Software Engineering, Concordia University, Canada. 
+\protect\\
+E-mail: \{fu\_chen, shang\}@encs.concordia.ca
+\IEEEcompsocthanksitem Mohammed Sayagh is with Ecole de Technologie Superieur - Quebec University, Canada.
+\protect\\
+E-mail: mohammed.sayagh@etsmtl.ca
+\IEEEcompsocthanksitem Bram Adams is with School of Computing, Queen’s University, Canada.
+\protect\\
+E-mail: bram.adams@queensu.ca
+\IEEEcompsocthanksitem Heng Li is with the Département de génie informatique et génie logiciel, Polytechnique Montreal, Canada. 
+\protect\\
+E-mail: heng.li@polymtl.ca
+
+}}
+
+
+\IEEEtitleabstractindextext{%
+\begin{abstract}
+
+\input{tex/abstract}
 \end{abstract}
 
-\input{chapters/intro}
-\input{chapters/background}
-\input{chapters/DataCollection}
-\input{chapters/Results}
-\input{chapters/threats}
-\input{chapters/related}
-\input{chapters/conclusion}
+\begin{IEEEkeywords}
+Software Performance, Performance Evolution, Highly configurable software systems
+\end{IEEEkeywords}}
+
+\maketitle
+
+\IEEEdisplaynontitleabstractindextext
+\IEEEpeerreviewmaketitle
+
+\input{tex/Introduction}
+\input{tex/Background}
+\input{tex/dataCollection}
+\input{tex/preliminary}
+\input{tex/RQ1}
+\input{tex/RQ2}
+\input{tex/ThreatsToValidity}
+\input{tex/RelatedWork}
+\input{tex/Conclusions}
 
 
-\bibliographystyle{IEEEtran}
-\bibliography{ConfigSLR}
+\bibliographystyle{IEEEtranS} % from bare_jrnl_compsoc.tex
+\small{
+\bibliography{bibliography} 
 
+% \vspace{8mm}
+
+
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{Bio-photo/Jinfu-Chen}}]
+{Jinfu Chen}
+is a Ph.D. student in the Department of Computer Science and Software Engineering at Concordia University, Montreal. He has received his M.Sc. degree from Chinese Academy of Sciences and he obtained B.Eng. from Harbin Institute of Technology. His research interest lies in empirical software engineering, software performance engineering, performance testing, software log mining. Contact him at \url{https://jinfuchen.github.io/jinfu}.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{Bio-photo/Mohammed_Sayagh.jpg}}]
+{Mohammed Sayagh}
+is an assistant professor at ETS (Quebec University). Before that, he was a postdoctoral fellow at the Software Analysis and Intelligence Lab (SAIL) at Queen’s University. He obtained his PhD from the Lab on Maintenance, Construction, and Intelligence of Software (MCIS) at Ecole Polytechnique Montreal (Canada). His research interests include empirical software engineering, multi-component software systems, and software configuration engineering. More details about his work are available on \url{https://sailhome.cs.queensu.ca/~msayagh}.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{Bio-photo/Heng-Li}}]
+{Heng Li}
+is an Assistant Professor in the Department of Computer Engineering and Software Engineering at Polytechnique Montreal, Montreal, Canada, where he leads the Maintenance, Operations and Observation of Software with intelligencE (MOOSE) lab. He obtained his Ph.D. from the School of Computing, Queen's University (Canada), M.Sc. from Fudan University (China), and B.Eng. from Sun Yat-sen University (China). He also worked at Synopsys as a software engineer for two years and worked at BlackBerry as a software performance engineer for another two years. His research interests lie within Software Engineering, in particular, software observability, intelligent operations of software systems, software log mining, software performance engineering, and mining software repositories. Contact him at: \url{heng.li@polymtl.ca}; \url{https://www.hengli.org}.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{Bio-photo/bram}}]
+{Bram Adams}
+is an associate professor at Queen’s University. His research interests include mining software   repositories, software release   engineering   and   the   role   of   human   affect   in software   engineering.   His   work   has   been   published   at   premier   software   engineering   venues such   as   EMSE,   TSE,   ICSE,   FSE,   MSR,   ASE   and   ICSME.   In   addition   to   co-organizing   the RELENG International Workshop on Release Engineering from 2013 to 2015 (and the 1st IEEE Software Special Issue on Release Engineering), he co-organized the SEMLA, PLATE, ACP4IS, MUD and MISS workshops, and the MSR Vision 2020 Summer School. He has been PC co-chair of SCAM 2013, SANER 2015, ICSME 2016 and MSR 2019.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{Bio-photo/Weiyi-Shang}}]
+{Weiyi Shang}
+is an Associate Professor and Concordia University Research Chair in Ultra-large-scale Systems at the Department of Computer Science and Software Engineering at Concordia University, Montreal. He has received his Ph.D. and M.Sc. degrees from Queens University (Canada) and he obtained B.Eng. from Harbin Institute of Technology. His research interests include big data software engineering, software engineering for Ultra-large-scale systems, software log mining, empirical software engineering, and software performance engineering. His work has been published at premier venues such as ICSE, FSE, ASE, ICSME, MSR and WCRE, as well as in major journals such as TSE, EMSE, JSS, JSEP and SCP. His work has won premium awards, such as two SIGSOFT Distinguished paper award at ICSE 2020 and 2013. His industrial experience includes helping improve the quality and performance of ultra-large-scale systems in BlackBerry. Early tools and techniques developed by him are already integrated into products used by millions of users worldwide. Contact him at \url{http://users.encs.concordia.ca/shang}.
+\end{IEEEbiography}
+
+}
 
 \end{document}
