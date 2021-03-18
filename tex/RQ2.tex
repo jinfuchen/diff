@@ -127,10 +127,11 @@ Removing one dimension at a time shows similar results. In fact, all the dimensi
 different from the model that combines all the metrics. %\med{just drop table 10}. 
 \end{comment}
 
-\begin{table}
-\tabcolsep=0.05cm
-\tiny
-\caption{The results (p-values) of using the Mann-Whitney U test to statistically compare the AUC of RF with the complete set of metrics vs. with a subset of metrics.}
+\begin{table*}
+% \tabcolsep=0.05cm
+%\tiny
+\centering
+\caption{The results (p-values) of using the Mann-Whitney U test to statistically compare the AUC of RF with the complete set of metrics vs. with a subset of metrics. }
     \begin{tabular}{|c|r|r|r|r|r|r|r|r|r|}
     \hline
     \multicolumn{10}{|c|}{Hadoop}   \\ \hline
@@ -146,11 +147,12 @@ different from the model that combines all the metrics. %\med{just drop table 10
     Cpu       & \textless{}\textless{}0.0001      & 0.001    & \textless{}\textless{}0.0001    & \textless{}\textless{}0.0001       &                       & \textless{}\textless{}0.0001   & \textless{}\textless{}0.0001  & 0.011& \textless{}\textless{}0.0001   \\ \cline{1-5} \cline{7-10} 
     Memory    & \textless{}\textless{}0.0001      & 0.009    & 0.093  & 0.013     &                       & \textless{}\textless{}0.0001   & \textless{}\textless{}0.0001  & 0.002& 0.011 \\ \cline{1-5} \cline{7-10} 
     I/O Read  & 0.001    & 0.016    & \textless{}\textless{}0.0001    & 0.006     &                       & \textless{}\textless{}0.0001   & \textless{}\textless{}0.0001  & \textless{}\textless{}0.0001  & 0.005 \\ \cline{1-5} \cline{7-10} 
-    I/O Write & 0.001    & 0.312    & \textless{}\textless{}0.0001    & 0.192     &                       & \textless{}\textless{}0.0001   & \textless{}\textless{}0.0001  & \textless{}\textless{}0.0001  & \textless{}\textless{}0.0001   \\ \cline{1-5} \cline{7-10} 
+    I/O Write & 0.001    & 0.312    & \textless{}\textless{}0.0001    & 0.192     &                       & \textless{}\textless{}0.0001   & \textless{}\textless{}0.0001  & \textless{}\textless{}0.0001  & \textless{}\textless{}0.0001   \\ \cline{1-5} \cline{7-10} \hline
     \end{tabular}
-\label{tab:difference}
+\label{tab:difference}\\
+\vspace{0.1cm}
 \footnotesize{CC is Code Change, CS is Code Structure, CT is Code Token, CON is Configuration.}
-\end{table}
+\end{table*}
 
 %\med{to double check if this is correct:}
 \textbf{The code token and configuration dimensions show the best performance among the four dimensions of metrics.} Figure 5 and Figure 6 in the appendix %~\ref{fig:importance-dimenssion-keep-hadoop} and \ref{fig:importance-dimenssion-keep-cassandra}

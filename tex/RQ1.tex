@@ -33,9 +33,11 @@ Below, we describe the detailed steps involved in our modeling process.
 
 
 \begin{table}[t]
+\centering
+\tabcolsep=0.1cm
      \caption{Overview of our selected metrics.}
     \label{tab:evaluatedSystems}
-        \begin{tabular}{|p{1.2cm}|p{1.8cm}|p{4.5cm}|}
+        \begin{tabular}{|p{1.3cm}|p{1.9cm}|p{4.9cm}|}
         \hline
         Dimension & Metric           & Rationale \\ %\hline
         \hline
@@ -44,7 +46,7 @@ Below, we describe the detailed steps involved in our modeling process.
   & Number of modified directories & Changing   more directories may more likely introduce performance regressions~\cite{mockus2000predicting}.\\ \cline{2-3} 
   & Number of modified files & Changing many source files are more likely to cause performance regressions~\cite{Nagappan:2006:MMP}.\\
   \cline{2-3} 
-  & Distribution of modified code across files & Scattered changes are more possible to introduce performance regressions~\cite{Hassan:2009:PFU}.\\ \cline{2-3} 
+  & Modified code across files & Scattered changes are more possible to cause performance regressions~\cite{Hassan:2009:PFU}.\\ \cline{2-3} 
   & Number of modified methods & Changes   altering many methods are more likely to introduce performance regressions~\cite{Zimmermann:2007:PDE}. \\ \cline{2-3} 
   & Number of lines SOC in tests & Program   with more lines is more likely to suffer from performance regressions~\cite{Koru2009tse}.\\ \cline{2-3} 
   & Lines of code added & The   more lines of code added, the higher risk that the program will suffer from performance   regressions~\cite{Nagappan:2005:URC,Zimmermann:2007:PDE}.\\ 
@@ -55,11 +57,11 @@ Below, we describe the detailed steps involved in our modeling process.
 \cline{2-3} 
   & McCabe Cyclomatic complexity & Program with higher complexity is more likely to suffer from performance regressions~\cite{Hassan:2009:PFU}.\\ 
   \cline{2-3} 
-  & Number of called subprograms & Large called subprograms will amplify the regression if there exist performance regressions in the called program~\cite{Nagappan:2006:MMP}.\\
+  & Number of called subprograms & Large called subprograms will amplify the regressions if there exist regressions in the called program~\cite{Nagappan:2006:MMP}.\\
   \cline{2-3} 
-  & Number of calling subprograms & Large   calling subprograms will amplify the regressions if there exist performance regressions in the called program~\cite{Nagappan:2006:MMP}.\\ 
+  & Number of calling subprograms & Large calling subprograms will amplify the regressions if there exist regressions in the called program~\cite{Nagappan:2006:MMP}.\\ 
   \hline
-Code token& Code tokens of the changed source code & Some code tokens may be more related to performance than other tokens.\\ 
+Code token& Code tokens of the changed code & Some code tokens may be more related to performance than other tokens.\\ 
 \hline
 Option token & Split configuration option names & The name components of a configuration option may be related to a specific performance metric.\\ \hline
 \end{tabular}
@@ -151,15 +153,19 @@ We then perform a redundancy analysis on the features. In particular, we use eac
 \noindent\textbf{Step 3. Model evaluation.}
 %\textit{Evaluation metrics.}
 %\textit{Ten-fold cross-validation.}
-We use 10-fold cross-validation to evaluate the performance of our models. %\bram{did we evaluate actual prediction? if not, we should talk about ``explanatory models'' instead of ``prediction models''}
+We use 10-fold cross-validation to evaluate the performance of our models. %\bram{did we evaluate actual prediction? if not, we should talk about ``explanatory models'' instead of ``prediction models''} 
+We choose 10-fold validation for the following reasons: 
+(1) K-fold cross-validation helps us better use our limited data. 
+(2) We can get more stable results. We make predictions on all of our data because each fold will be kept as a test set once in the k-fold cross-validation.
+%https://towardsdatascience.com/5-reasons-why-you-should-use-cross-validation-in-your-data-science-project-8163311a1e79
 In each repetition of the 10-fold cross-validation, the whole data set is randomly partitioned into 10 sets of roughly equal size. One subset is used as the testing set (i.e., the held-out set) and the other nine subsets are used as the training set. 
 We train our models using the training set and evaluate the performance of our models on the held-out set.
 The process repeats 10 times until all subsets are used as a testing set once.
 
 In each fold of the cross-validation, we use precision, recall and 
-AUC to measure the performance of our models.
+Area Under the ROC Curve (AUC) to measure the performance of our models.
 Precision measures the ratio of cases when a configuration option actually impacts the performance regression detection among all the cases that our models predict to adjust a configuration option (i.e., $\frac{\textnormal{true positives}}{\textnormal{true positives} + \textnormal{false positives}}$). Recall measures the ratio of cases when our models predict to adjust a configuration option among all the cases when a configuration option actually impacts the performance regressions detection (i.e., $\frac{\textnormal{true positives}}{\textnormal{true positives} + \textnormal{false negatives}}$). 
-AUC measures our models' ability to discriminate the \instance cases into \inconsistent and non-\inconsistent cases. Specifically, AUC is the area under the ROC curve, which plots the true positive rate against the false positive rate under different classification thresholds. 
+AUC measures our models' ability to discriminate the \instance cases into \inconsistent and non-\inconsistent cases. Specifically, AUC is the area under the ROC curve, which plots the true positive rate against the false positive rate under different classification thresholds~\cite{lobo2008auc}. 
 Prior work recommends the use of AUC over threshold-dependent measures (e.g., precision and recall) when measuring the model performance~\cite{tantithamthavorn18experience}.
 %\med{we should instead say data is not equally distributed, so precision and recall are not good performance metrics + drop precision and recall from the tables.}We also included the evaluation results of other metrics (precision and recall) in our replication package~\heng{to do: add replication package}. \jinfu{After update Precision and recall in NN and CNN, we can keep precision and recall.}
 
@@ -167,12 +173,12 @@ Prior work recommends the use of AUC over threshold-dependent measures (e.g., pr
 % \subsubsection*{Results} 
 %\heng{Check RQ2 results}
 %\med{what about adding (1) a model that predicts when a \instance suffers from an \inconsistent on at least one performance measure and (3) another model on all the performance measures. the goal of this is to simulate different use cases. the first use case (1) is for people who are interested on any performance metric, what (2) we already have is for people who are interested on one precise performance metric, and the (3) is for people who are looking for very bad options that cause problems on all the performance metrics. } \jinfu{If practitioners want to predict whether a \instance suffers from \inconsistent in any of performance metric, practitioners can combine the five predictors. In other words, any of the model in five performance metrics predicts a \instance suffers from \inconsistent.}
-\noindent \textbf{Our models can effectively predict when a \instance is manifesting an \inconsistent for all of our five studied performance measures} (as shown in Table 1 %~\ref{tab:model_evaluation_hadoop} 
-and Table 2 %~\ref{tab:model_evaluation_cassandra}
-in the appendix). % show the performance of our models for predicting whether adjusting a configuration option would cause difference in the results of performance regression detection. 
+\noindent \textbf{Our models can effectively predict when a \instance is manifesting an \inconsistent for all of our five studied performance measures} (as shown in Table~\ref{tab:model_evaluation_hadoop} 
+and Table~\ref{tab:model_evaluation_cassandra}). 
+%in the appendix). % show the performance of our models for predicting whether adjusting a configuration option would cause difference in the results of performance regression detection. 
 Our best models (i.e., as indicated by the \textbf{\textit{bold-italic}} values) achieve an AUC of 0.85 to 0.94 on the \emph{Hadoop} project and 0.79 to 0.90 on the \emph{Cassandra} project, for different performance metrics.
 For the \emph{Hadoop} project, %~\heng{make the wording system or project consistent throughout the paper}, 
-RF is the best model for four out of the five performance metrics, achieving an AUC of 0.85 to 0.93. Even if XG shows the best AUC performance for the fifth performance metric (i.e., Response time), the difference between RF and XG is only 0.01. 
+RF is the best model for four out of the five performance metrics, achieving an AUC of 0.85 to 0.93. In the findings of Grebhahn et al.~\cite{grebhahn2019predicting}, random forest performs better compared to other prediction models for related problems. Even if XG shows the best AUC performance for the fifth performance metric (i.e., Response time), the difference between RF and XG is only 0.01. 
 For the \emph{Cassandra} project, RF shows the best performance on three out of five performance metrics. NN shows the best performance on also three performance metrics (Memory and I/O read have the same performance as the RF model). The average AUC of the best NN model is 0.83, while the average AUC of the best RF model is 0.82. 
 Note that %\med{is the following correct?} 
 NN, on the other side, requires a large amount of resources to train and test a model, while the improvements it shows over RF is trivial.
@@ -182,6 +188,115 @@ CNN shows the best performance on only one performance metric (i.e., with an AUC
 In summary, we suggest that developers consider the RF model for predicting when a \instance has an \inconsistent problem. 
 %, a precision of 0.72 to 0.79, a recall of 0.33 to 0.60 for the Hadoop project, and an AUC of 0.75 to 0.86, a precision of 0.67 to 0.77, a recall of 0.46 to 0.65 for the Cassandra project.
 %an average \emph{AUC} of 0.83 and 0.75 in \emph{Hadoop} and \emph{Cassandra}, respectively. 
+
+\begin{table*}
+\centering
+%\scriptsize
+% \tabcolsep=0.08cm
+\caption{\emph{Hadoop}'s results of using different models to predict whether configuration options cause the manifesting of \inconsistent. The best results for each performance metric and each model are highlighted in \textit{italic}. The best results for each performance metric across different models are highlighted in \textbf{\textit{bold-italic}}.} %\heng{Still a few results show very low precision and recall but high AUC (e.g., NN with tf-idf on Hadoop for Res. time and CPU, CNN with tf-idf on Hadoop for CPU} \heng{Todo: only keep AUC} \jinfu{Update Table6 and Table7}}
+
+\begin{tabular}{|c|r|r|r|r|r|r|r|r|r|}
+\hline
+\multicolumn{10}{|c|}{Hadoop}    \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{RF with tf-idf}        & \multicolumn{3}{c|}{RF with PCA}           & \multicolumn{3}{c|}{RF with code embedding}\\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.68  & 0.39    & \textit{0.93}            & 0.68  & 0.39    & 0.66 & 0.73  & 0.33    & \textit{0.93}            \\ \hline
+Cpu               & 0.70  & 0.51    & 0.90 & 0.55  & 0.02    & 0.71 & 0.77  & 0.60    & \textit{\textbf{0.92}}   \\ \hline
+Memory            & 0.64  & 0.36    & 0.87 & 0.48  & 0.04    & 0.69 & 0.75  & 0.41    & \textit{\textbf{0.91}}   \\ \hline
+I/O Read          & 0.68  & 0.54    & 0.91 & 0.58  & 0.02    & 0.76 & 0.79  & 0.56    & \textit{\textbf{0.93}}   \\ \hline
+I/O Write         & 0.63  & 0.44    & 0.82 & 0.44  & 0.02    & 0.59 & 0.72  & 0.49    & \textit{\textbf{0.85}}   \\ \hline
+Average           & 0.67  & 0.45    & 0.89 & 0.55  & 0.10    & 0.68 & 0.75  & 0.48    & \textit{\textbf{0.91}}   \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{LR with tf-idf}        & \multicolumn{3}{c|}{LR with PCA}           & \multicolumn{3}{c|}{LR with code embedding}\\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.38  & 0.03    & 0.67 & 0.12  & 0.46    & 0.54 & 0.53  & 0.09    & \textit{0.77}            \\ \hline
+Cpu               & 0.66  & 0.06    & 0.73 & 0.27  & 0.29    & 0.61 & 0.48  & 0.14    & \textit{0.76}            \\ \hline
+Memory            & 0.49  & 0.04    & 0.71 & 0.16  & 0.40    & 0.55 & 0.48  & 0.10    & \textit{0.73}            \\ \hline
+I/O Read          & 0.70  & 0.05    & 0.71 & 0.22  & 0.33    & 0.57 & 0.46  & 0.18    & \textit{0.80}            \\ \hline
+I/O Write         & 0.50  & 0.06    & 0.64 & 0.33  & 0.22    & 0.57 & 0.50  & 0.14    & \textit{0.66}            \\ \hline
+Average           & 0.55  & 0.05    & 0.69 & 0.22  & 0.34    & 0.57 & 0.49  & 0.13    & \textit{0.74}            \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{XG with tf-idf}        & \multicolumn{3}{c|}{XG with PCA}           & \multicolumn{3}{c|}{XG with code embedding}\\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.65  & 0.42    & \textit{\textbf{0.94}}   & 1.00  & 0.05    & 0.60 & 0.71  & 0.31    & 0.93 \\ \hline
+Cpu               & 0.66  & 0.48    & \textit{0.88}            & 0.32  & 0.06    & 0.62 & 0.67  & 0.50    & \textit{0.88}            \\ \hline
+Memory            & 0.66  & 0.32    & \textit{0.87}            & 0.41  & 0.04    & 0.68 & 0.72  & 0.32    & \textit{0.87}            \\ \hline
+I/O Read          & 0.66  & 0.49    & \textit{0.91}            & 0.49  & 0.08    & 0.73 & 0.73  & 0.50    & \textit{0.91}            \\ \hline
+I/O Write         & 0.66  & 0.38    & \textit{0.82}            & 0.41  & 0.16    & 0.58 & 0.67  & 0.40    & 0.80 \\ \hline
+Average           & 0.66  & 0.42    & \textit{0.88}            & 0.52  & 0.08    & 0.64 & 0.70  & 0.41    & 0.88 \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{NN with tf-idf}        & \multicolumn{3}{c|}{NN with PCA}           & \multicolumn{3}{c|}{NN with code embedding}\\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.34  & 0.54    & 0.79 & 0.27  & 0.83    & \textit{0.80}            & 0.27  & 0.64    & 0.75 \\ \hline
+Cpu               & 0.53  & 0.30    & 0.72 & 0.63  & 0.41    & \textit{0.73}            & 0.39  & 0.33    & 0.65 \\ \hline
+Memory            & 0.43  & 0.27    & \textit{0.67}            & 0.52  & 0.34    & \textit{0.67}            & 0.31  & 0.42    & 0.66 \\ \hline
+I/O Read          & 0.53  & 0.44    & 0.73 & 0.60  & 0.46    & \textit{0.76}            & 0.48  & 0.33    & 0.72 \\ \hline
+I/O Write         & 0.50  & 0.38    & \textit{0.68}            & 0.53  & 0.32    & 0.65 & 0.39  & 0.41    & \textit{0.68}            \\ \hline
+Average           & 0.47  & 0.39    & \textit{0.72}            & 0.51  & 0.47    & \textit{0.72}            & 0.37  & 0.43    & 0.69 \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{CNN with tf-idf}       & \multicolumn{3}{c|}{CNN with PCA}          & \multicolumn{3}{c|}{CNN with code embedding}                   \\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.29  & 0.48    & 0.75 & 0.06  & 0.90    & 0.73 & 0.23  & 0.51    & \textit{0.79}            \\ \hline
+Cpu               & 0.22  & 0.68    & 0.78 & 0.18  & 0.78    & 0.76 & 0.63  & 0.25    & \textit{0.81}            \\ \hline
+Memory            & 0.47  & 0.25    & 0.69 & 0.13  & 0.87    & 0.74 & 0.20  & 0.57    & \textit{0.76}            \\ \hline
+I/O Read          & 0.32  & 0.41    & \textit{0.68}            & 0.27  & 0.25    & \textit{0.68}            & 0.20  & 0.38    & 0.66 \\ \hline
+I/O Write         & 0.27  & 0.31    & 0.64 & 0.14  & 0.64    & 0.65 & 0.19  & 0.60    & \textit{0.67}            \\ \hline
+Average           & 0.31  & 0.43    & 0.71 & 0.16  & 0.69    & 0.71 & 0.29  & 0.46    & \textit{0.74}            \\ \hline
+\end{tabular}
+
+\label{tab:model_evaluation_hadoop}
+\end{table*}
+
+
+
+
+\begin{table*}
+\centering
+%\tabcolsep=0.08cm
+%\scriptsize
+\caption{\emph{Cassandra}'s results of using different models to predict whether configuration options cause the manifesting of \inconsistent. The best results for each performance metric and each model are highlighted in \textit{italic}. The best results for each performance metric across different models are highlighted in \textbf{\textit{bold-italic}}.}
+\begin{tabular}{|c|r|r|r|r|r|r|r|r|r|}
+\hline
+\multicolumn{10}{|c|}{Cassandra}          \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{RF with tf-idf}      & \multicolumn{3}{c|}{RF with PCA}         & \multicolumn{3}{c|}{RF with code embedding}                   \\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.74 & 0.37   & 0.74& 0.45 & 0.13   & 0.62& 0.67 & 0.46   & \textit{0.75}            \\ \hline
+Cpu               & 0.68 & 0.39   & 0.76& 0.46 & 0.15   & 0.61& 0.73 & 0.59   & \textit{0.82}            \\ \hline
+Memory            & 0.71 & 0.37   & 0.78& 0.35 & 0.04   & 0.61& 0.71 & 0.58   & \textit{\textbf{0.84}}   \\ \hline
+I/O Read          & 0.74 & 0.48   & 0.79& 0.54 & 0.32   & 0.67& 0.74 & 0.63   & \textit{\textbf{0.83}}   \\ \hline
+I/O Write         & 0.76 & 0.50   & 0.82& 0.58 & 0.32   & 0.68& 0.77 & 0.65   & \textit{\textbf{0.86}}   \\ \hline
+Average           & 0.73 & 0.42   & 0.78& 0.47 & 0.19   & 0.64& 0.72 & 0.58   & \textit{0.82}            \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{LR with tf-idf}      & \multicolumn{3}{c|}{LR with PCA}         & \multicolumn{3}{c|}{LR with code embedding}                   \\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.38 & 0.38   & 0.59& 0.28 & 0.54   & 0.54& 0.38 & 0.51   & \textit{0.63}            \\ \hline
+Cpu               & 0.49 & 0.42   & 0.64& 0.33 & 0.41   & 0.53& 0.46 & 0.58   & \textit{0.65}            \\ \hline
+Memory            & 0.44 & 0.26   & 0.62& 0.29 & 0.28   & 0.55& 0.43 & 0.47   & \textit{0.66}            \\ \hline
+I/O Read          & 0.50 & 0.50   & 0.63& 0.35 & 0.44   & 0.55& 0.49 & 0.61   & \textit{0.67}            \\ \hline
+I/O Write         & 0.53 & 0.51   & \textit{0.69}            & 0.36 & 0.37   & 0.54& 0.47 & 0.63   & 0.68\\ \hline
+Average           & 0.47 & 0.41   & 0.64& 0.32 & 0.41   & 0.54& 0.44 & 0.56   & \textit{0.66}            \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{XG with tf-idf}      & \multicolumn{3}{c|}{XG with PCA}         & \multicolumn{3}{c|}{XG with code embedding}                   \\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.66 & 0.38   & \textit{0.75}            & 0.37 & 0.20   & 0.60& 0.63 & 0.44   & 0.74\\ \hline
+Cpu               & 0.65 & 0.49   & 0.77& 0.49 & 0.32   & 0.63& 0.70 & 0.60   & \textit{0.82}            \\ \hline
+Memory            & 0.65 & 0.49   & 0.80& 0.45 & 0.13   & 0.60& 0.70 & 0.56   & \textit{0.83}            \\ \hline
+I/O Read          & 0.69 & 0.55   & 0.79& 0.46 & 0.35   & 0.61& 0.72 & 0.62   & \textit{0.81}            \\ \hline
+I/O Write         & 0.74 & 0.59   & 0.84& 0.48 & 0.33   & 0.65& 0.74 & 0.64   & \textit{0.85}            \\ \hline
+Average           & 0.68 & 0.50   & 0.79& 0.45 & 0.27   & 0.62& 0.70 & 0.57   & \textit{0.81}            \\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{NN with tf-idf}      & \multicolumn{3}{c|}{NN with PCA}         & \multicolumn{3}{c|}{NN with code embedding}                   \\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.55 & 0.36   & 0.71& 0.53 & 0.40   & \textit{0.73}            & 0.47 & 0.41   & 0.67\\ \hline
+Cpu               & 0.27 & 0.94   & 0.88& 0.31 & 0.96   & \textit{\textbf{0.90}}   & 0.26 & 0.88   & 0.84\\ \hline
+Memory            & 0.56 & 0.51   & 0.76& 0.64 & 0.57   & \textit{\textbf{0.84}}   & 0.61 & 0.49   & 0.76\\ \hline
+I/O Read          & 0.66 & 0.46   & 0.75& 0.67 & 0.57   & \textit{\textbf{0.83}}   & 0.60 & 0.54   & 0.74\\ \hline
+I/O Write         & 0.67 & 0.39   & 0.77& 0.70 & 0.57   & \textit{0.84}            & 0.63 & 0.55   & 0.77\\ \hline
+Average           & 0.54 & 0.53   & 0.77& 0.57 & 0.62   & \textit{\textbf{0.83}}   & 0.51 & 0.57   & 0.76\\ \hline
+\multirow{2}{*}{} & \multicolumn{3}{c|}{CNN with tf-idf}     & \multicolumn{3}{c|}{CNN with PCA}        & \multicolumn{3}{c|}{CNN with code embedding}                  \\ \cline{2-10} 
+                  & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} & \multicolumn{1}{c|}{Pre.} & \multicolumn{1}{c|}{Recall} & \multicolumn{1}{c|}{AUC} \\ \hline
+Res. time         & 0.30 & 0.28   & 0.75& 0.37 & 0.35   & \textit{\textbf{0.79}}   & 0.33 & 0.34   & 0.75\\ \hline
+Cpu               & 0.29 & 0.37   & \textit{0.76}            & 0.25 & 0.67   & 0.75& 0.11 & 0.96   & \textit{0.76}            \\ \hline
+Memory            & 0.37 & 0.21   & \textit{0.77}            & 0.37 & 0.21   & \textit{0.77}            & 0.33 & 0.30   & 0.74\\ \hline
+I/O Read          & 0.19 & 0.53   & \textit{0.69}            & 0.30 & 0.37   & 0.68& 0.24 & 0.47   & \textit{0.69}            \\ \hline
+I/O Write         & 0.23 & 0.40   & \textit{0.70}            & 0.19 & 0.38   & 0.67& 0.23 & 0.33   & 0.69\\ \hline
+Average           & 0.28 & 0.36   & \textit{0.73}            & 0.30 & 0.40   & \textit{0.73}            & 0.25 & 0.48   & \textit{0.73}            \\ \hline
+\end{tabular}
+\label{tab:model_evaluation_cassandra}
+\end{table*}
 
 %\med{I don't see any value on this comparison. both of them are good}\noindent\textbf{Our models are better at distinguishing the \instance cases that need adjustments of the configuration options and that do not for the Hadoop project than for the Cassandra project.} 
 %Table~\ref{tab:model_evaluation_hadoop} and Table~\ref{tab:model_evaluation_cassandra} show that 
@@ -196,6 +311,8 @@ As discussed in RQ1 of our preliminary study, the different commits show more in
 In contrast, for the deep neural network models (NN and CNN), using PCA to represent the code tokens may achieve better results than the other two representations. For example, for the \emph{Cassandra} project, the CNN model combined with PCA achieves the best AUC for two out of the five performance metrics, across all different models.
 The reason might be that there are much more options in our studied systems %\bram{in what sense?} 
 in the deep neural network models, while using PCA could significantly reduce the number of options to be trained.
+
+%\noindent\textbf{Discussion} \jinfu{The comparison between prior study and our approach.}
 
 %\noindent \textbf{Our models can be used to equally predict performance regression introduced by adjusting configuration option in all performance metrics.} By examining the prediction results with all performance metrics, we find that all the performance metrics have similar \emph{AUC}s. 
 %\noindent \textbf{For the Hadoop project, our models achieve the best performance for predicting the impact of adjusting configurations on the detection of response time regressions and worst performance on I/O write regressions. For the Cassandra project, our models achieve more consistent performance across different performance metrics.} As shown in Table~\ref{tab:model_evaluation_hadoop} and Table~\ref{tab:model_evaluation_cassandra}, for the Hadoop project, our best models achieve an AUC of 0.97 for the response time metric and an AUC of 0.85 for the I/O write metric. 

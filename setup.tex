@@ -14,6 +14,7 @@
 \usepackage{hyperref}
 \usepackage{longtable}
 
+
 \newcommand{\specialcell}[2][c]{%
   \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
 
@@ -43,15 +44,15 @@
 \definecolor{custom-gray}{cmyk}{0, 0, 0, 0.7, 1.00}
 \newtcbtheorem[no counter]{Summary}{\hskip-0.97em}{enhanced,drop shadow={black!50!white},
   coltitle=white,
-  top=0.15in,
+  top=0.1in,
   attach boxed title to top left=
-  {xshift=1.5em,yshift=-\tcboxedtitleheight/2},
+  {xshift=1em,yshift=-\tcboxedtitleheight/2},
   boxed title style={size=small,colback=custom-gray}
 }{summary}
 
-\newcommand{\PQI}{How common are \inconsistent issues? }
+\newcommand{\PQI}{Are \inconsistent issues common in the studied systems? }
 \newcommand{\PQII}{How difficult is it to manually identify \inconsistent issues?}
 
 \newcommand{\RQI}{What is the impact of configuration on performance regression?}
-\newcommand{\RQII}{How accurately can we predict \inconsistent issues? }
+\newcommand{\RQII}{Can we accurately learn \inconsistent issues in the studied systems? }
 \newcommand{\RQIII}{What are the most important metrics for predicting \inconsistent issues? }
